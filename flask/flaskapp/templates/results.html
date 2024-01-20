@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% for dict_item in metadatas %}
+        {% if distances is not none %}
+            Distance Score: {{ distances[loop.index0] }}
+        {% endif %}
+        <br>
+        {% for key, value in dict_item.items() %}
+            {% if key == "relative_path" %}
+                <img src="{{ value }}" style="width:300px;">
+            {% endif %}
+        {% endfor %}
+        <form method="post" class="similar" action="/similar">
+            <input type="hidden" id="similar" name="similar" value="{{ ids[loop.index0] }}" />
+            <button type="submit">Similar Images</button>
+        </form>
+        <br>
+    {% endfor %}
+{% endblock %}

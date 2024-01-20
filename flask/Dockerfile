@@ -11,4 +11,16 @@ RUN apt update && \
     apt autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
-#RUN pip3 install --user flask
+RUN pip3 install --user --no-cache chromadb open-clip-torch
+
+COPY init-clip.py /init-clip.py
+
+RUN python3 /init-clip.py
+
+WORKDIR /
+
+ENV FLASK_APP=flaskapp
+
+COPY flaskapp/ /flaskapp
+
+CMD ["flask", "run", "--with-threads", "--debugger", "--host=0.0.0.0"]

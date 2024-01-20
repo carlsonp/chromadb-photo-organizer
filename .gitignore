@@ -2,6 +2,7 @@ images/*
 !images/empty.txt
 .env
 postgres-data/
+chromadb-data/
 
 
 

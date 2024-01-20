@@ -1,21 +1,16 @@
 version: '3.1'
 services:
   chromadb:
+    # https://github.com/chroma-core/chroma/blob/main/docker-compose.yml
     image: chromadb/chroma:latest
     hostname: chromadb
     restart: unless-stopped
     # ports:
     #  - "8000:8000/tcp"
+    volumes:
+      - ./chromadb-data:/chroma/chroma
     environment:
       ANONYMIZED_TELEMETRY: False # disable telemetry metrics
-  indexer:
-    build: ./indexer/
-    hostname: indexer
-    volumes:
-      - ./images:/images:ro
-    depends_on:
-      - chromadb
-      - postgresql
   flask:
     build: ./flask/
     hostname: flask
