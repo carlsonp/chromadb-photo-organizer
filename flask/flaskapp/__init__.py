@@ -4,10 +4,13 @@ import chromadb
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from chromadb.utils.data_loaders import ImageLoader
 from threading import Thread
+import threading
 from indeximages import threaded_index
 from PIL import Image
 import numpy as np
 from utility import get_imgs
+
+lock = threading.Lock()
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True, static_folder='/home/carlsonp/src/chromadb-photo-organizer/images/')
@@ -23,9 +26,8 @@ def create_app():
     def index():
         try:
             # TODO: add ability to force a full index refresh via the URL
-            # TODO: set lock so index can't be called again
-
-            thread = Thread(target=threaded_index)
+            
+            thread = Thread(target=threaded_index, args=(lock,))
             thread.daemon = True
             thread.start()
 

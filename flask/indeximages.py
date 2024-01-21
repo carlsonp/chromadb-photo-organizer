@@ -3,9 +3,12 @@ import chromadb
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from chromadb.utils.data_loaders import ImageLoader
 from utility import get_imgs
+import threading
 
-def threaded_index():
+
+def threaded_index(lock):
     try:
+        lock.acquire()
         #client = chromadb.HttpClient(host='chromadb', port=8000)
         client = chromadb.HttpClient(host='192.168.1.112', port=8000)
 
@@ -40,7 +43,7 @@ def threaded_index():
         i = 0
         batchamount = 50
         while (i < len(ids)):
-            print(f"adding {i} - {batchamount}")
+            print(f"adding {i} - {i+batchamount}")
             if (i+batchamount > len(ids)):
                 collection.add(ids=ids[i:len(ids)], uris=image_uris[i:len(ids)], metadatas=relative_paths[i:len(ids)])
                 break
@@ -48,5 +51,6 @@ def threaded_index():
                 collection.add(ids=ids[i:i+batchamount], uris=image_uris[i:i+batchamount], metadatas=relative_paths[i:i+batchamount])
             i = i + batchamount
         print("Finished indexing images")
+        lock.release()
     except Exception as e:
         print(f"Error: {e}")
