@@ -51,7 +51,12 @@ def threaded_index(lock):
                 collection.add(ids=ids[i:i+batchamount], uris=image_uris[i:i+batchamount], metadatas=metadatas[i:i+batchamount])
             i = i + batchamount
         
-        # TODO: delete images from ChromaDB that no longer exist on disk
+        # delete images from ChromaDB that no longer exist on disk
+        metadatacleanup = collection.get(include=[])
+        for img in metadatacleanup['ids']:
+            if (not Path(img).is_file()):
+                print(f"Removing image: {img} from ChromaDB as it no longer exists on disk")
+                collection.delete(ids=[img])
 
         print("Finished indexing images")
         lock.release()
