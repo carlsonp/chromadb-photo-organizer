@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <br>
+    {% for dict_item in metadatas %}
+        {% for key, value in dict_item.items() %}
+            {% if key == "relative_path" %}
+                <div style="text-align:center;">
+                    <a href="/favorite?downvote={{ id }}"><iconify-icon icon="material-symbols:keyboard-arrow-left"></iconify-icon>Downvote</a> | 
+                    <a href="/favorite"><iconify-icon icon="material-symbols:keyboard-arrow-up"></iconify-icon> Random <iconify-icon icon="material-symbols:keyboard-arrow-up"></iconify-icon></a> | 
+                    <a href="/favorite?upvote={{ id }}">Upvote<iconify-icon icon="material-symbols:keyboard-arrow-right"></iconify-icon></a>
+                </div>
+                <div class="imgbox" id="imgbox">
+                    <img class="center-fit" src="{{ value }}" onclick="this.requestFullscreen()">
+                </div>
+            {% endif %}
+            {% if key == "favoritecount" %}
+                <div style="text-align:center;"><iconify-icon icon="material-symbols:favorite"></iconify-icon>Favorites: {{ value }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+    <script>
+        var myElement = document.getElementById('imgbox');
+        var mc = new Hammer(myElement);
+        mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
+    
+        mc.on("swipeleft swiperight swipeup", function(ev) {
+            if (ev.type == "swipeleft") {
+                window.location.href = "/favorite?downvote={{ id }}";
+            } else if (ev.type == "swiperight") {
+                window.location.href = "/favorite?upvote={{ id }}";
+            } else if (ev.type == "swipeup") {
+                window.location.href = "/favorite";
+            }
+        });
+    </script>
+{% endblock %}
