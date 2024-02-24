@@ -6,6 +6,7 @@
             Distance Score: {{ distances[loop.index0] }}
         {% endif %}
         <br>
+        <a href="/favorite?favorite={{ ids[loop.index0] }}">
         {% for key, value in dict_item.items() %}
             {% if key == "relative_path" %}
                 <img src="{{ value }}" style="width:300px;"><br>
@@ -14,11 +15,11 @@
                 <iconify-icon icon="material-symbols:favorite"></iconify-icon>Favorites: {{ value }}<br>
             {% endif %}
         {% endfor %}
+        </a>
         <form method="post" class="similar" action="/similar">
             <input type="hidden" id="similar" name="similar" value="{{ ids[loop.index0] }}" />
             <button type="submit">Similar Images</button>
         </form>
-        <a href="/favorite?favorite={{ ids[loop.index0] }}">Favorite</a>
         <br>
     {% endfor %}
 {% endblock %}

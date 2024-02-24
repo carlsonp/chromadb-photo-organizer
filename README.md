@@ -28,11 +28,13 @@ Access the web-ui: http://127.0.0.1:5000
 Local development and testing
 
 ```shell
-pip3 install --user chromadb open-clip-torch
+pip3 install --user chromadb open-clip-torch gunicorn
 export FLASK_APP=flaskapp
 export FLASK_ENV=development
 cd ./flask/
 flask run --with-threads --debugger --host=0.0.0.0
+# or for faster productionized testing via gunicorn
+gunicorn -w 4 -b 0.0.0.0:5000 'flaskapp:create_app()'
 ```
 
 Use the `detox` utility to mass fix filenames, remove special characters, spaces, etc.
@@ -49,6 +51,13 @@ find . -type f -name '*.*' | sed 's|.*\.||' | sort -u
 # adjust and convert the gifs
 sudo apt install imagemagick
 find . -type f -name "*.gif" -exec convert '{}[0]' {}.png \;
+```
+
+Cleanup files by extension
+
+```shell
+# for example .mp4 files
+find . -type f -name '*.mp4' -exec rm -f {} \;
 ```
 
 Access the adminer page for connectivity to the Postgresql database backend.

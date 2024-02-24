@@ -11,7 +11,7 @@ RUN apt update && \
     apt autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --user --no-cache chromadb open-clip-torch
+RUN pip3 install --user --no-cache chromadb open-clip-torch gunicorn
 
 COPY init-clip.py /init-clip.py
 
@@ -23,4 +23,7 @@ ENV FLASK_APP=flaskapp
 
 COPY flaskapp/ /flaskapp
 
-CMD ["flask", "run", "--with-threads", "--debugger", "--host=0.0.0.0"]
+# for debugging
+#CMD ["flask", "run", "--with-threads", "--debugger", "--host=0.0.0.0"]
+# for production
+CMD [ "gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "'flaskapp:create_app()'"]
