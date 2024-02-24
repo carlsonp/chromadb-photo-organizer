@@ -2,13 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>chromadb-photo-organizer</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
         .imgbox {
             display: grid;
             height: 100%;
@@ -21,12 +19,50 @@
     </style>
     <script src="{{url_for('static', filename='js/hammer.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/iconify-icon.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
 </head>
 <body>
-    <h1><a href="./">chromadb-photo-organizer</a></h1>
-    <br>
-    <b><a href="/index">Index Images</a></b> | <b><a href="/deleteindex">Delete Index</a></b> | <b><a href="/randomimages">Random Images</a></b> | <b><a href="/favorite">Browse and Favorite</a></b>
-    <hr>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+        <a class="navbar-brand" href="/">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+      
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href="/randomimages">Random Images</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/favorite">Browse and Favorite</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Admin
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/index">Index Images</a></li>
+                    <li><a class="dropdown-item" href="/deleteindex">Delete Index</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                About
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="https://github.com/carlsonp/chromadb-photo-organizer">Github Page</a></li>
+                </ul>
+            </li>
+          </ul>
+          <form method="post" class="d-flex" class="search" role="search" action="/search">
+            <input class="form-control me-2" type="text" id="search" name="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+        </div>
+        </div>
+      </nav>
+
     <div class="content">
         {% block content %} {% endblock %}
     </div>

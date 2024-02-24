@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container">
+    <div class="row">
     {% for dict_item in metadatas %}
-        {% if distances is not none %}
-            Distance Score: {{ distances[loop.index0] }}
-        {% endif %}
+        <div class="col-md-auto">
         <br>
         <a href="/favorite?favorite={{ ids[loop.index0] }}">
         {% for key, value in dict_item.items() %}
@@ -12,14 +12,18 @@
                 <img src="{{ value }}" style="width:300px;"><br>
             {% endif %}
             {% if key == "favoritecount" %}
-                <iconify-icon icon="material-symbols:favorite"></iconify-icon>Favorites: {{ value }}<br>
+                <iconify-icon icon="material-symbols:favorite"></iconify-icon>Favorites: <strong>{{ value }}</strong>
+                <br>
             {% endif %}
         {% endfor %}
         </a>
-        <form method="post" class="similar" action="/similar">
+        <br>
+        <form method="post" class="similar text-center" action="/similar">
             <input type="hidden" id="similar" name="similar" value="{{ ids[loop.index0] }}" />
             <button type="submit">Similar Images</button>
         </form>
-        <br>
+        </div>
     {% endfor %}
+    </div>
+</div>
 {% endblock %}

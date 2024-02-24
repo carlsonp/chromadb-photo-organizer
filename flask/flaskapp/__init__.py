@@ -19,15 +19,17 @@ def create_app():
     @app.route('/')
     def homepage():
         try:
-            return render_template('index.html')
+            client = chromadb.HttpClient(host='192.168.1.112', port=8000)
+            embedding_function = OpenCLIPEmbeddingFunction()
+            collection = client.get_or_create_collection(name='chromadb-photo-organizer', embedding_function=embedding_function)
+
+            return render_template('index.html', numberimages=collection.count())
         except Exception as e:
             app.logger.error(e)
     
     @app.route('/index')
     def index():
         try:
-            # TODO: add ability to force a full index refresh via the URL
-
             if not lock.locked():
                 thread = Thread(target=threaded_index, args=(lock,))
                 thread.daemon = True
@@ -47,9 +49,9 @@ def create_app():
             collection = client.get_or_create_collection(name='chromadb-photo-organizer', embedding_function=embedding_function)
             
             # https://docs.trychroma.com/usage-guide#querying-a-collection
-            retrieved = collection.query(query_texts=[request.form.get('search')], include=['data', 'distances', 'metadatas'], n_results=6)
+            retrieved = collection.query(query_texts=[request.form.get('search')], include=['data', 'metadatas'], n_results=8)
 
-            return render_template('results.html', ids=retrieved['ids'][0], imageuris=retrieved['uris'][0], metadatas=retrieved['metadatas'][0], distances=[ '%.3f' % elem for elem in retrieved['distances'][0] ])
+            return render_template('results.html', ids=retrieved['ids'][0], imageuris=retrieved['uris'][0], metadatas=retrieved['metadatas'][0])
 
         except Exception as e:
             app.logger.error(e)
@@ -65,9 +67,9 @@ def create_app():
             query_image = np.array(Image.open(request.form.get('similar')))
             
             # https://docs.trychroma.com/usage-guide#querying-a-collection
-            retrieved = collection.query(query_images=[query_image], include=['data', 'distances', 'metadatas'], n_results=6)
+            retrieved = collection.query(query_images=[query_image], include=['data', 'metadatas'], n_results=8)
 
-            return render_template('results.html', ids=retrieved['ids'][0], imageuris=retrieved['uris'][0], metadatas=retrieved['metadatas'][0], distances=[ '%.3f' % elem for elem in retrieved['distances'][0] ])
+            return render_template('results.html', ids=retrieved['ids'][0], imageuris=retrieved['uris'][0], metadatas=retrieved['metadatas'][0])
         except Exception as e:
             app.logger.error(e)
     
@@ -82,12 +84,12 @@ def create_app():
             image_uris = []
             for img in get_imgs("/home/carlsonp/src/chromadb-photo-organizer/static/images/", []):
                 image_uris.append(img)
-            randomlyselected = random.sample(image_uris, 6)
+            randomlyselected = random.sample(image_uris, 4)
 
             # https://docs.trychroma.com/usage-guide#querying-a-collection
             retrieved = collection.get(ids=randomlyselected, include=['metadatas'])
 
-            return render_template('results.html', ids=retrieved['ids'], imageuris=retrieved['uris'], metadatas=retrieved['metadatas'], distances=None)
+            return render_template('results.html', ids=retrieved['ids'], imageuris=retrieved['uris'], metadatas=retrieved['metadatas'])
 
         except Exception as e:
             app.logger.error(e)
