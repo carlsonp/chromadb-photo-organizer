@@ -4,6 +4,7 @@ from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from chromadb.utils.data_loaders import ImageLoader
 from utility import get_imgs
 import threading
+from pathlib import Path
 
 def threaded_index(lock):
     try:
@@ -29,7 +30,12 @@ def threaded_index(lock):
 
         metadatas = []
         for p in image_uris:
-            metadatas.append({"relative_path": p.replace('/home/carlsonp/src/chromadb-photo-organizer', '.'), "favoritecount": 0})
+            # add gif to the metadata path if the file exists, otherwise the static image
+            if (Path(p.removesuffix('.png')).is_file()):
+                gif_path = p.replace('/home/carlsonp/src/chromadb-photo-organizer', '.').removesuffix('.png')
+                metadatas.append({"relative_path": gif_path, "favoritecount": 0})
+            else:
+                metadatas.append({"relative_path": p.replace('/home/carlsonp/src/chromadb-photo-organizer', '.'), "favoritecount": 0})
         
         ids = image_uris
 

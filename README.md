@@ -35,6 +35,22 @@ cd ./flask/
 flask run --with-threads --debugger --host=0.0.0.0
 ```
 
+Use the `detox` utility to mass fix filenames, remove special characters, spaces, etc.
+
+```shell
+detox -r -v .
+```
+
+Extract the first frame from animated gifs
+
+```shell
+# find all unique file extensions
+find . -type f -name '*.*' | sed 's|.*\.||' | sort -u
+# adjust and convert the gifs
+sudo apt install imagemagick
+find . -type f -name "*.gif" -exec convert '{}[0]' {}.png \;
+```
+
 Access the adminer page for connectivity to the Postgresql database backend.
 
 http://127.0.0.1:8080
