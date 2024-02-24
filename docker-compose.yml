@@ -15,7 +15,7 @@ services:
     build: ./flask/
     hostname: flask
     volumes:
-      - ./images:/images:ro
+      - ./static:/static:ro
     ports:
       - "5000:5000/tcp"
     depends_on:

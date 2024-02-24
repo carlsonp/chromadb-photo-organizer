@@ -13,7 +13,7 @@ A photo similarity and organization tool leveraging the [chromadb](https://trych
 
 Copy `.env-copy` to `.env` and edit as needed
 
-Add your images and photos to the `./images/` folder.
+Add your images and photos to the `./static/images/` folder.
 
 Bring up all the services via Docker
 

@@ -3,22 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>chromadb-photo-organizer</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
-        nav a {
-            color: #d64161;
-            font-size: 3em;
-            margin-left: 50px;
-            text-decoration: none;
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        .imgbox {
+            display: grid;
+            height: 100%;
+        }
+        .center-fit {
+            max-width: 100%;
+            max-height: 100vh;
+            margin: auto;
         }
     </style>
+    <script src="{{url_for('static', filename='js/hammer.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/iconify-icon.min.js')}}"></script>
 </head>
 <body>
     <h1><a href="./">chromadb-photo-organizer</a></h1>
-    <b><a href="/index">Index Images</a></b> | <b><a href="/random">Random</a></b>
+    <br>
+    <b><a href="/index">Index Images</a></b> | <b><a href="/deleteindex">Delete Index</a></b> | <b><a href="/randomimages">Random Images</a></b> | <b><a href="/favorite">Browse and Favorite</a></b>
     <hr>
     <div class="content">
         {% block content %} {% endblock %}
     </div>
-
 </body>
 </html>

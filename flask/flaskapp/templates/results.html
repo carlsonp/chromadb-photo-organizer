@@ -8,13 +8,17 @@
         <br>
         {% for key, value in dict_item.items() %}
             {% if key == "relative_path" %}
-                <img src="{{ value }}" style="width:300px;">
+                <img src="{{ value }}" style="width:300px;"><br>
+            {% endif %}
+            {% if key == "favoritecount" %}
+                <iconify-icon icon="material-symbols:favorite"></iconify-icon>Favorites: {{ value }}<br>
             {% endif %}
         {% endfor %}
         <form method="post" class="similar" action="/similar">
             <input type="hidden" id="similar" name="similar" value="{{ ids[loop.index0] }}" />
             <button type="submit">Similar Images</button>
         </form>
+        <a href="/favorite?favorite={{ ids[loop.index0] }}">Favorite</a>
         <br>
     {% endfor %}
 {% endblock %}
