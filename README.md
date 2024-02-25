@@ -28,13 +28,7 @@ Access the web-ui: http://127.0.0.1:5000
 Local development and testing
 
 ```shell
-pip3 install --user chromadb open-clip-torch gunicorn
-export FLASK_APP=flaskapp
-export FLASK_ENV=development
-cd ./flask/
-flask run --with-threads --debugger --host=0.0.0.0
-# or for faster productionized testing via gunicorn
-gunicorn -w 4 -b 0.0.0.0:5000 'flaskapp:create_app()'
+docker compose -f docker-compose-dev.yml up -d --build
 ```
 
 Use the `detox` utility to mass fix filenames, remove special characters, spaces, etc.

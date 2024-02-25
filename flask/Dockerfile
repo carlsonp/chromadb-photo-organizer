@@ -20,15 +20,16 @@ COPY init-clip.py /
 
 RUN python3 /init-clip.py
 
+COPY startup-dev.sh /
+RUN chmod +x startup-dev.sh
+
 COPY *.py /
 
 WORKDIR /
 
 ENV FLASK_APP=flaskapp
 
-COPY flaskapp/ /flaskapp
+# add path to gunicorn
+ENV PATH="${PATH}:/root/.local/bin/"
 
-# for debugging/development
-CMD ["flask", "run", "--with-threads", "--debugger", "--host=0.0.0.0"]
-# for production
-#CMD [ "gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "'flaskapp:create_app()'"]
+COPY flaskapp/ /flaskapp
