@@ -25,6 +25,7 @@ def create_app():
             return render_template('index.html', numberimages=collection.count())
         except Exception as e:
             app.logger.error(e)
+            return "Failure on homepage"
     
     @app.route('/index')
     def index():
@@ -54,6 +55,7 @@ def create_app():
 
         except Exception as e:
             app.logger.error(e)
+            return "Failure searching"
     
     @app.route('/similar', methods=['POST'])
     def similar():
@@ -71,6 +73,7 @@ def create_app():
             return render_template('results.html', ids=retrieved['ids'][0], imageuris=retrieved['uris'][0], metadatas=retrieved['metadatas'][0])
         except Exception as e:
             app.logger.error(e)
+            return "Failure finding similar images"
     
     @app.route('/randomimages')
     def randomimages():
@@ -92,6 +95,7 @@ def create_app():
 
         except Exception as e:
             app.logger.error(e)
+            return "Failure getting random images"
 
     @app.route('/deleteindex')
     def deleteindex():
@@ -151,5 +155,6 @@ def create_app():
             return render_template('favorite.html', id=retrieved['ids'][0], imageuris=retrieved['uris'], metadatas=retrieved['metadatas'])
         except Exception as e:
             app.logger.error(e)
+            return "Failure in favorite images"
 
     return app
