@@ -3,7 +3,6 @@ import chromadb
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from chromadb.utils.data_loaders import ImageLoader
 from utility import get_imgs
-import threading
 from pathlib import Path
 
 def threaded_index(lock):

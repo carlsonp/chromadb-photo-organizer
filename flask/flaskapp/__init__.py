@@ -3,7 +3,6 @@ from flask import Flask, render_template, request
 import chromadb
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from chromadb.utils.data_loaders import ImageLoader
-from threading import Thread
 import threading
 from indeximages import threaded_index
 from PIL import Image
@@ -31,7 +30,7 @@ def create_app():
     def index():
         try:
             if not lock.locked():
-                thread = Thread(target=threaded_index, args=(lock,))
+                thread = threading.Thread(target=threaded_index, args=(lock,))
                 thread.daemon = True
                 thread.start()
                 return render_template('index.html', textmessage="Started indexing images")
