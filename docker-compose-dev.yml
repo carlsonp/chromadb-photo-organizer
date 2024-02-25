@@ -1,0 +1,31 @@
+version: '3.1'
+services:
+  chromadb:
+    # https://github.com/chroma-core/chroma/blob/main/docker-compose.yml
+    image: chromadb/chroma:latest
+    hostname: chromadb
+    restart: unless-stopped
+    # ports:
+    #  - "8000:8000/tcp"
+    volumes:
+      - ./chromadb-data:/chroma/chroma
+    environment:
+      ANONYMIZED_TELEMETRY: False # disable telemetry metrics
+    healthcheck:
+      test: [ "CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/8000" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  flask:
+    build: ./flask/
+    hostname: flask
+    volumes:
+      - ./static:/static:ro
+      - ./flask:/flask:ro
+    environment:
+      FLASK_DEBUG: 1
+    ports:
+      - "5000:5000/tcp"
+    depends_on:
+      - chromadb
+    command: ["/startup-dev.sh"]
