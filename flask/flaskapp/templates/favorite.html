@@ -15,7 +15,7 @@
                 </div>
             {% endif %}
             {% if key == "favoritecount" %}
-                <div style="text-align:center;"><iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon>Favorites: <strong>{{ value }}</strong></div>
+                <div style="text-align:center;"><iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon>Favorite Votes: <strong>{{ value }}</strong></div>
             {% endif %}
         {% endfor %}
     {% endfor %}
@@ -34,4 +34,18 @@
             }
         });
     </script>
+    {% if exif != None %}
+        <div style="text-align:center;">
+            <button class="btn btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfo" aria-expanded="false" aria-controls="collapseInfo">
+                Info
+            </button>
+            <div class="collapse" id="collapseInfo">
+            <div class="card card-body">
+                {% for key, value in exif.items() %}
+                    <p>{{ key }}: <strong>{{ value }}</strong></p>
+                {% endfor %}
+            </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

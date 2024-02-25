@@ -5,7 +5,8 @@ from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from chromadb.utils.data_loaders import ImageLoader
 import threading
 from indeximages import threaded_index
-from PIL import Image
+from PIL import Image, ExifTags
+from PIL.ExifTags import TAGS
 import numpy as np
 from utility import get_imgs
 
@@ -152,7 +153,16 @@ def create_app():
             
             retrieved = collection.get(ids=[img], include=['metadatas'])
 
-            return render_template('favorite.html', id=retrieved['ids'][0], imageuris=retrieved['uris'], metadatas=retrieved['metadatas'])
+            # get image EXIF metadata
+            img = Image.open(retrieved['ids'][0])
+            img_exif = {}
+            for tag_id in img.getexif():
+                tag = TAGS.get(tag_id, tag_id)
+                img_exif.update({tag: img.getexif().get(tag_id)})
+            if not img_exif:
+                img_exif = None
+
+            return render_template('favorite.html', id=retrieved['ids'][0], imageuris=retrieved['uris'], metadatas=retrieved['metadatas'], exif=img_exif)
         except Exception as e:
             app.logger.error(e)
             return "Failure in favorite images"

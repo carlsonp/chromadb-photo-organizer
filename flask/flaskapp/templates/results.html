@@ -9,7 +9,7 @@
         <div class="col-3">
         {% for key, value in dict_item.items() %}
             {% if key == "favoritecount" %}
-                <iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon>Favorites: <strong>{{ value }}</strong>
+                <iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon>Favorite Votes: <strong>{{ value }}</strong>
                 <br>
             {% endif %}
             {% if key == "relative_path" %}
