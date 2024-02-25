@@ -6,9 +6,15 @@
         {% for key, value in dict_item.items() %}
             {% if key == "relative_path" %}
                 <div style="text-align:center;">
-                    <a href="/favorite?downvote={{ id }}"><iconify-icon icon="material-symbols:keyboard-arrow-left"></iconify-icon>Downvote</a> | 
-                    <a href="/favorite"><iconify-icon icon="material-symbols:keyboard-arrow-up"></iconify-icon> Random <iconify-icon icon="material-symbols:keyboard-arrow-up"></iconify-icon></a> | 
-                    <a href="/favorite?upvote={{ id }}">Upvote<iconify-icon icon="material-symbols:keyboard-arrow-right"></iconify-icon></a>
+                    <a href="/favorite?downvote={{ id }}">
+                        <button class="btn btn-danger"><iconify-icon icon="material-symbols:keyboard-arrow-left"></iconify-icon>Downvote</button>
+                    </a>
+                    <a href="/favorite">
+                        <button class="btn btn-info"><iconify-icon icon="material-symbols:keyboard-arrow-up"></iconify-icon> Random <iconify-icon icon="material-symbols:keyboard-arrow-up"></iconify-icon></button>
+                    </a>
+                    <a href="/favorite?upvote={{ id }}">
+                        <button class="btn btn-success">Upvote<iconify-icon icon="material-symbols:keyboard-arrow-right"></iconify-icon></button>
+                    </a>
                 </div>
                 <div class="imgbox" id="imgbox">
                     <img class="center-fit" src="{{ value }}" onclick="this.requestFullscreen()">
