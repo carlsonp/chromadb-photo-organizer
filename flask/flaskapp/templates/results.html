@@ -2,11 +2,39 @@
 
 {% block content %}
 <br>
-<div class="container">
-    <div class="row text-center">
+<div class="container text-center">
+    {% if conditional is defined and value is defined %}
+        <form method="get" class="filter" role="filter" action="/filteredimages">
+            <div class="row justify-content-md-center">
+                <div class="col-lg-auto col-sm-12">
+                    <span class="input-group-text">Filter Favorites/Votes: </span>
+                </div>
+                <div class="col-lg-auto col-sm-12">
+                    <select name="conditional" id="conditional" class="form-select" aria-label="Vote Filter">
+                        <option {% if conditional == 'gt' %} selected{% endif %} value="gt">Greater Than</option>
+                        <option {% if conditional == 'lt' %} selected{% endif %} value="lt">Less Than</option>
+                        <option {% if conditional == 'eq' %} selected{% endif %} value="eq">Equal To</option>
+                    </select>
+                </div>
+                <div class="col-lg-auto col-sm-12">
+                    <input type="number" name="value" id="value" class="form-control" aria-label="value" value="{{ value }}">
+                </div>
+                <div class="col-lg-auto col-sm-12">
+                    <button class="btn btn-primary" type="submit">Filter Images</button>
+                </div>
+            </div>
+        </form>
+        <br>
+    {% endif %}
+
+    {% if metadatas is defined and metadatas|length == 0 %}
+        <div class="alert alert-warning" role="alert">No results</div>
+    {% endif %}
+    
+    <div class="row">
     {% for dict_item in metadatas %}
         {% set outer_loop = loop.index0 %}
-        <div class="col-3">
+        <div class="col-lg-3 col-sm-12">
         {% for key, value in dict_item.items() %}
             {% if key == "favoritecount" %}
                 <iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon>Favorite Votes: <strong>{{ value }}</strong>

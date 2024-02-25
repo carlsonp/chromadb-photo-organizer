@@ -37,6 +37,9 @@
             <li class="nav-item">
                 <a class="nav-link" href="/favorite">Browse and Favorite</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/filteredimages?conditional=gt&value=0">Top Favorited Images</a>
+            </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Admin
@@ -56,7 +59,7 @@
             </li>
           </ul>
           <form method="post" class="d-flex" class="search" role="search" action="/search">
-            <input class="form-control me-2" type="text" id="search" name="search" placeholder="Search" aria-label="Search">
+            <input class="form-control me-2" type="text" id="search" name="search" placeholder="Search Images" aria-label="Search">
             <button class="btn btn-success" type="submit">Search</button>
           </form>
         </div>

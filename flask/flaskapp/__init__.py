@@ -98,6 +98,34 @@ def create_app():
             app.logger.error(e)
             return "Failure getting random images"
 
+    @app.route('/filteredimages')
+    def filteredimages():
+        try:
+            client = chromadb.HttpClient(host='192.168.1.112', port=8000)
+            embedding_function = OpenCLIPEmbeddingFunction()
+            data_loader = ImageLoader()
+            collection = client.get_or_create_collection(name='chromadb-photo-organizer', embedding_function=embedding_function, data_loader=data_loader)
+
+            # https://docs.trychroma.com/usage-guide#querying-a-collection
+            # https://docs.trychroma.com/usage-guide#using-where-filters
+            
+            retrieved = collection.get(include=['metadatas', 'uris'], where={"favoritecount": {f"${request.args.get('conditional')}": int(request.args.get('value'))}})
+            if (len(retrieved['ids']) >= 8):
+                max_results = 8
+            else:
+                max_results = len(retrieved['ids'])
+            # randomize the results
+            filtered_index = random.sample(range(0, len(retrieved['ids'])), max_results)
+
+            # TODO: order the results as well once it's implemented?
+            # https://github.com/chroma-core/chroma/issues/469
+
+            return render_template('results.html', ids=[retrieved['ids'][i] for i in filtered_index], imageuris=[retrieved['uris'][i] for i in filtered_index], metadatas=[retrieved['metadatas'][i] for i in filtered_index], conditional=request.args.get('conditional'), value=request.args.get('value'))
+
+        except Exception as e:
+            app.logger.error(e)
+            return "Failure getting filtered images"
+
     @app.route('/deleteindex')
     def deleteindex():
         # existing items don't seem to have metadata updated so in some cases it's easier just to blow it away
