@@ -15,7 +15,7 @@
                 </div>
             {% endif %}
             {% if key == "favoritecount" %}
-                <div style="text-align:center;"><iconify-icon icon="material-symbols:favorite"></iconify-icon>Favorites: <strong>{{ value }}</strong></div>
+                <div style="text-align:center;"><iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon>Favorites: <strong>{{ value }}</strong></div>
             {% endif %}
         {% endfor %}
     {% endfor %}

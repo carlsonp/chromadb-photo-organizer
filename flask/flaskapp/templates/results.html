@@ -1,26 +1,29 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<br>
 <div class="container">
-    <div class="row">
+    <div class="row text-center">
     {% for dict_item in metadatas %}
-        <div class="col-md-auto">
-        <br>
-        <a href="/favorite?favorite={{ ids[loop.index0] }}">
+        {% set outer_loop = loop.index0 %}
+        <div class="col-3">
         {% for key, value in dict_item.items() %}
-            {% if key == "relative_path" %}
-                <img src="{{ value }}" style="width:300px;"><br>
-            {% endif %}
             {% if key == "favoritecount" %}
-                <iconify-icon icon="material-symbols:favorite"></iconify-icon>Favorites: <strong>{{ value }}</strong>
+                <iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon>Favorites: <strong>{{ value }}</strong>
+                <br>
+            {% endif %}
+            {% if key == "relative_path" %}
+                <a href="/favorite?favorite={{ ids[outer_loop] }}">
+                    <img class="img-fluid" src="{{ value }}">
+                </a>
                 <br>
             {% endif %}
         {% endfor %}
-        </a>
+        
         <br>
-        <form method="post" class="similar text-center" action="/similar">
+        <form method="post" class="similar" action="/similar">
             <input type="hidden" id="similar" name="similar" value="{{ ids[loop.index0] }}" />
-            <button type="submit">Similar Images</button>
+            <button class="btn btn-info" type="similar">Similar Images</button>
         </form>
         </div>
     {% endfor %}
