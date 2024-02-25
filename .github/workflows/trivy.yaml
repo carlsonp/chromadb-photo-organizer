@@ -1,0 +1,44 @@
+name: trivy
+
+on:
+  # workflow_dispatch is required in order to manually run this workflow
+  workflow_dispatch:
+  schedule:
+    # run weekly on Mondays
+    - cron: "0 13 * * 1"
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Build and push docker
+        id: docker_build
+        # https://github.com/docker/build-push-action
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ghcr.io/carlsonp/chromadb-photo-organizer:latest
+          # https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md
+          cache-from: type=registry,ref=ghcr.io/carlsonp/chromadb-photo-organizer:latest
+          cache-to: type=inline
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          ignore-unfixed: true
+          image-ref: 'ghcr.io/carlsonp/chromadb-photo-organizer'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
