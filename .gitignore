@@ -1,7 +1,6 @@
 static/images/*
 !static/images/empty.txt
 .env
-postgres-data/
 chromadb-data/
 
 

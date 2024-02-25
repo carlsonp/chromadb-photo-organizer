@@ -9,8 +9,7 @@ def threaded_index(lock):
     try:
         lock.acquire()
 
-        #client = chromadb.HttpClient(host='chromadb', port=8000)
-        client = chromadb.HttpClient(host='192.168.1.112', port=8000)
+        client = chromadb.HttpClient(host='chromadb', port=8000)
 
         embedding_function = OpenCLIPEmbeddingFunction()
         image_loader = ImageLoader()
@@ -24,17 +23,17 @@ def threaded_index(lock):
         print(f"Existing indexed images: {len(existingids['ids'])}")
                     
         image_uris = []
-        for img in get_imgs("/home/carlsonp/src/chromadb-photo-organizer/static/images/", existingids['ids']):
+        for img in get_imgs("/static/images/", existingids['ids']):
             image_uris.append(img)
 
         metadatas = []
         for p in image_uris:
             # add gif to the metadata path if the file exists, otherwise the static image
             if (Path(p.removesuffix('.png')).is_file()):
-                gif_path = p.replace('/home/carlsonp/src/chromadb-photo-organizer', '.').removesuffix('.png')
+                gif_path = p.removeprefix('/', './').removesuffix('.png')
                 metadatas.append({"relative_path": gif_path, "favoritecount": 0})
             else:
-                metadatas.append({"relative_path": p.replace('/home/carlsonp/src/chromadb-photo-organizer', '.'), "favoritecount": 0})
+                metadatas.append({"relative_path": p.removeprefix('/', './'), "favoritecount": 0})
         
         ids = image_uris
 

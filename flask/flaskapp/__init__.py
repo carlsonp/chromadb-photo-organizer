@@ -14,12 +14,12 @@ from utility import get_imgs
 lock = threading.Lock()
 
 def create_app():
-    app = Flask(__name__, instance_relative_config=True, static_folder='/home/carlsonp/src/chromadb-photo-organizer/static/')
+    app = Flask(__name__, instance_relative_config=True, static_folder='/static/')
 
     @app.route('/')
     def homepage():
         try:
-            client = chromadb.HttpClient(host='192.168.1.112', port=8000)
+            client = chromadb.HttpClient(host='chromadb', port=8000)
             embedding_function = OpenCLIPEmbeddingFunction()
             collection = client.get_or_create_collection(name='chromadb-photo-organizer', embedding_function=embedding_function)
 
@@ -27,6 +27,10 @@ def create_app():
         except Exception as e:
             app.logger.error(e)
             return "Failure on homepage"
+    
+    @app.route('/health')
+    def health():
+        return "Ok"
     
     @app.route('/index')
     def index():
@@ -45,7 +49,7 @@ def create_app():
     @app.route('/search', methods=['POST'])
     def search():
         try:
-            client = chromadb.HttpClient(host='192.168.1.112', port=8000)
+            client = chromadb.HttpClient(host='chromadb', port=8000)
             embedding_function = OpenCLIPEmbeddingFunction()
             collection = client.get_or_create_collection(name='chromadb-photo-organizer', embedding_function=embedding_function)
             
@@ -62,7 +66,7 @@ def create_app():
     def similar():
         try:
             # finds images that are similar to a provided image
-            client = chromadb.HttpClient(host='192.168.1.112', port=8000)
+            client = chromadb.HttpClient(host='chromadb', port=8000)
             embedding_function = OpenCLIPEmbeddingFunction()
             collection = client.get_or_create_collection(name='chromadb-photo-organizer', embedding_function=embedding_function)
 
@@ -79,13 +83,13 @@ def create_app():
     @app.route('/randomimages')
     def randomimages():
         try:
-            client = chromadb.HttpClient(host='192.168.1.112', port=8000)
+            client = chromadb.HttpClient(host='chromadb', port=8000)
             embedding_function = OpenCLIPEmbeddingFunction()
             data_loader = ImageLoader()
             collection = client.get_or_create_collection(name='chromadb-photo-organizer', embedding_function=embedding_function, data_loader=data_loader)
             
             image_uris = []
-            for img in get_imgs("/home/carlsonp/src/chromadb-photo-organizer/static/images/", []):
+            for img in get_imgs("/static/images/", []):
                 image_uris.append(img)
             randomlyselected = random.sample(image_uris, 4)
 
@@ -101,7 +105,7 @@ def create_app():
     @app.route('/filteredimages')
     def filteredimages():
         try:
-            client = chromadb.HttpClient(host='192.168.1.112', port=8000)
+            client = chromadb.HttpClient(host='chromadb', port=8000)
             embedding_function = OpenCLIPEmbeddingFunction()
             data_loader = ImageLoader()
             collection = client.get_or_create_collection(name='chromadb-photo-organizer', embedding_function=embedding_function, data_loader=data_loader)
@@ -130,7 +134,7 @@ def create_app():
     def deleteindex():
         # existing items don't seem to have metadata updated so in some cases it's easier just to blow it away
         try:
-            client = chromadb.HttpClient(host='192.168.1.112', port=8000)
+            client = chromadb.HttpClient(host='chromadb', port=8000)
         except Exception as e:
             app.logger.error(e)
             return "Unable to connect to ChromaDB"
@@ -146,7 +150,7 @@ def create_app():
     def favorite():
         try:
             # favorite images and see other images that are similar to it
-            client = chromadb.HttpClient(host='192.168.1.112', port=8000)
+            client = chromadb.HttpClient(host='chromadb', port=8000)
             embedding_function = OpenCLIPEmbeddingFunction()
             collection = client.get_or_create_collection(name='chromadb-photo-organizer', embedding_function=embedding_function)
 
@@ -168,20 +172,19 @@ def create_app():
                 query_image = np.array(Image.open(request.args.get('upvote')))
                 # return a few images since the first image is always the one searched for
                 # we also don't want to get into a loop where the images are all completely
-                # similar to one another so we add a little variability with randomness
-                # in terms of the match score
+                # similar to one another so we pick one at random
                 retrieved = collection.query(query_images=[query_image], include=['metadatas'], n_results=6)
                 img = retrieved['ids'][0][random.randint(1, 5)]
             else:
                 # randomly select an image if nothing is passed in or we downvoted an image
                 image_uris = []
-                for img in get_imgs("/home/carlsonp/src/chromadb-photo-organizer/static/images/", []):
+                for img in get_imgs("/static/images/", []):
                     image_uris.append(img)
                 img = random.sample(image_uris, 1)[0]
             
             retrieved = collection.get(ids=[img], include=['metadatas'])
 
-            # get image EXIF metadata
+            # get image EXIF metadata if it exists
             img = Image.open(retrieved['ids'][0])
             img_exif = {}
             for tag_id in img.getexif():

@@ -60,18 +60,6 @@ Cleanup files by extension
 find . -type f -name '*.mp4' -exec rm -f {} \;
 ```
 
-Access the adminer page for connectivity to the Postgresql database backend.
-
-http://127.0.0.1:8080
-
-Then enter the following:
-
-* System: `PostgreSQL`
-* Server: `postgresql`
-* Username: `root` <username set in `.env`>
-* Password: `secret` <password set in `.env`>
-* Database: `chromadb`
-
 ## References
 
 * https://docs.trychroma.com/deployment

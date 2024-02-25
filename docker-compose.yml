@@ -11,6 +11,11 @@ services:
       - ./chromadb-data:/chroma/chroma
     environment:
       ANONYMIZED_TELEMETRY: False # disable telemetry metrics
+    healthcheck:
+      test: [ "CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/8000" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
   flask:
     build: ./flask/
     hostname: flask
@@ -20,27 +25,3 @@ services:
       - "5000:5000/tcp"
     depends_on:
       - chromadb
-      - postgresql
-  postgresql:
-    image: postgres:16
-    hostname: postgresql
-    restart: unless-stopped
-    # ports:
-    #   - "5432:5432/tcp"
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_DB: chromadb
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data:rw
-    depends_on:
-      - chromadb
-  adminer:
-    image: adminer:latest
-    hostname: adminer
-    restart: unless-stopped
-    ports:
-      - "8080:8080/tcp"
-    depends_on:
-      - postgresql
