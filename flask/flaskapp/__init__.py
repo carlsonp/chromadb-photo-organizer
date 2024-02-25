@@ -34,9 +34,9 @@ def create_app():
                 thread = Thread(target=threaded_index, args=(lock,))
                 thread.daemon = True
                 thread.start()
-                return "Started indexing images"
+                return render_template('index.html', textmessage="Started indexing images")
             else:
-                return "Index already running"
+                return render_template('index.html', textmessage="Index already running")
         except Exception as e:
             app.logger.error(e)
             return "Failure indexing"
@@ -108,7 +108,7 @@ def create_app():
             app.logger.warning(e)
             return "Index does not exist to delete"
 
-        return "Deleted index"
+        return render_template('index.html', textmessage="Index deleted")
     
     @app.route('/favorite')
     def favorite():
