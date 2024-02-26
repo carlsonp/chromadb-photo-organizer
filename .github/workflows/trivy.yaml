@@ -30,9 +30,9 @@ jobs:
           context: "{{defaultContext}}:flask"
           push: true
           tags: ghcr.io/carlsonp/chromadb-photo-organizer:latest
-          # https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md
-          cache-from: type=registry,ref=ghcr.io/carlsonp/chromadb-photo-organizer:latest
-          cache-to: type=inline
+          # https://docs.docker.com/build/ci/github-actions/cache/
+          #cache-from: type=registry,ref=ghcr.io/carlsonp/chromadb-photo-organizer:latest
+          #cache-to: type=inline
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
       - name: Run Trivy vulnerability scanner
