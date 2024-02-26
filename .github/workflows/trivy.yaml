@@ -30,6 +30,7 @@ jobs:
           context: "{{defaultContext}}:flask"
           push: false
           tags: ghcr.io/carlsonp/chromadb-photo-organizer:latest
+          load: true
           # https://docs.docker.com/build/ci/github-actions/cache/
           #cache-from: type=registry,ref=ghcr.io/carlsonp/chromadb-photo-organizer:latest
           #cache-to: type=inline
