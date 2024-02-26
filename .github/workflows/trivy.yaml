@@ -28,7 +28,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: "{{defaultContext}}:flask"
-          push: true
+          push: false
           tags: ghcr.io/carlsonp/chromadb-photo-organizer:latest
           # https://docs.docker.com/build/ci/github-actions/cache/
           #cache-from: type=registry,ref=ghcr.io/carlsonp/chromadb-photo-organizer:latest
