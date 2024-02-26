@@ -39,7 +39,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           ignore-unfixed: true
-          image-ref: 'ghcr.io/carlsonp/chromadb-photo-organizer'
+          image-ref: 'ghcr.io/carlsonp/chromadb-photo-organizer:latest'
           format: 'sarif'
           output: 'trivy-results.sarif'
       - name: Upload Trivy scan results to GitHub Security tab
