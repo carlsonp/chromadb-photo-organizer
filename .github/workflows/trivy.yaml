@@ -11,18 +11,17 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Login to GitHub Container Registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Build and push docker
+      - name: Build and push docker
         id: docker_build
         # https://github.com/docker/build-push-action
         uses: docker/build-push-action@v5
+        working-directory: ./flask
         with:
           push: true
           tags: ghcr.io/carlsonp/chromadb-photo-organizer:latest
