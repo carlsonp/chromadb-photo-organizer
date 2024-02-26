@@ -22,7 +22,8 @@ jobs:
         # https://github.com/docker/build-push-action
         uses: docker/build-push-action@v5
         with:
-          file: flask/Dockerfile
+          file: ./flask/Dockerfile
+          context: ./flask
           push: true
           tags: ghcr.io/carlsonp/chromadb-photo-organizer:latest
           # https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md
