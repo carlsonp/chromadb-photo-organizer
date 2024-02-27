@@ -42,7 +42,7 @@
             {% endif %}
             {% if key == "relative_path" %}
                 <a href="/favorite?favorite={{ ids[outer_loop] }}">
-                    <img class="img-fluid" src="{{ value }}">
+                    <img class="img-fluid" alt="{{ value }}" src="{{ value }}">
                 </a>
                 <br>
             {% endif %}
