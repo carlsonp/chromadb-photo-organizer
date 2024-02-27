@@ -1,5 +1,6 @@
 import os, glob, random
 from flask import Flask, render_template, request
+from flask_compress import Compress
 import chromadb
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from chromadb.utils.data_loaders import ImageLoader
@@ -15,6 +16,7 @@ lock = threading.Lock()
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True, static_folder='/static/')
+    Compress(app)
 
     @app.route('/')
     def homepage():
