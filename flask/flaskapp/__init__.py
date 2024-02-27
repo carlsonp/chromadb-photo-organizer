@@ -36,7 +36,7 @@ def create_app():
     def index():
         try:
             if not lock.locked():
-                thread = threading.Thread(target=threaded_index, args=(lock,))
+                thread = threading.Thread(target=threaded_index, args=(lock,app,))
                 thread.daemon = True
                 thread.start()
                 return render_template('index.html', textmessage="Started indexing images")

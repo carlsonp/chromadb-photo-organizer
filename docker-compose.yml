@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.8'
 services:
   chromadb:
     # https://github.com/chroma-core/chroma/blob/main/docker-compose.yml
@@ -17,10 +17,15 @@ services:
       timeout: 5s
       retries: 3
   flask:
-    build: ./flask/
+    build:
+      context: ./flask/
+      args:
+        DOCKER_BUILDKIT: 1
     hostname: flask
     volumes:
-      - ./static:/static:ro
+      - ./static:/static:rw
+    environment:
+      ORGANIZE_FILES: ${ORGANIZE_FILES}
     expose:
       - 5000
     labels:

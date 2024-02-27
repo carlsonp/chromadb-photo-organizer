@@ -6,14 +6,23 @@ A photo similarity and organization tool leveraging the [chromadb](https://trych
 
 ## Requirements
 
-* Docker
+* Docker (with buildkit enabled, see `/etc/docker/daemon.json`)
 * docker compose
+
+## Features
+
+* Search your images using descriptive words such as "beach holiday" or "sunset".
+* Browse your images and find similar images quickly
+* Favorite and upvote images you like
+* Optionally cleanup file names
+* Extract images from GIF files
+* Supports PNG, JPG, and GIF files
 
 ## Installation and Setup
 
 Copy `.env-copy` to `.env` and edit as needed
 
-Add your images and photos to the `./static/images/` folder.
+Add your images and photos to the `./static/images/` folder.  **Always** keep a backup of your images!
 
 Generate a public cert and private key pair for Traefik.  For example:
 
@@ -32,7 +41,7 @@ Bring up all the services via Docker
 docker compose up -d --build
 ```
 
-Access the web-ui: http://127.0.0.1:5000
+Access the web-ui: http://<your IP or hostname>:8448
 
 ## For Developers
 
@@ -58,7 +67,7 @@ sudo apt install imagemagick
 find . -type f -name "*.gif" -exec convert '{}[0]' {}.png \;
 ```
 
-Cleanup files by extension
+Cleanup and delete files by extension
 
 ```shell
 # for example .mp4 files
