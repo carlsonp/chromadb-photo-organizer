@@ -31,6 +31,8 @@ cd ./traefik/
 openssl req -x509 -nodes -days 4096 -newkey rsa:2048 -out cert.crt -keyout cert.key -subj "/C=US/ST=Self/L=Self/O=Self/CN=192.168.1.112" -addext "subjectAltName = IP:192.168.1.112"
 ```
 
+Or use Let's Encrypt or some other method.
+
 Edit the `./traefik/traefik.yaml` file and adjust the *.crt and *.key names as needed.
 
 Edit `docker-compose.yml` and adjut the Traefik IP address or hostname
@@ -41,7 +43,8 @@ Bring up all the services via Docker
 docker compose up -d --build
 ```
 
-Access the web-ui: `http://<your IP or hostname>:8448`
+Access the web-ui: `https://<your IP or hostname>:8448` via your browser.
+You may need to accept the cert if it's self-signed.
 
 ## For Developers
 
