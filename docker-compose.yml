@@ -47,8 +47,16 @@ services:
       - --providers.docker.exposedByDefault=false
       - --providers.file.directory=/configuration/
       - --entryPoints.websecure.address=:8448
+      - --entryPoints.ping.address=:80
+      - --ping.entryPoint=ping
     ports:
       - "8448:8448"
     volumes:
       # so Traefik can listen to Docker events
       - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: wget --quiet --tries=1 --spider http://127.0.0.1/ping || exit 1
+      interval: 10s
+      timeout: 1s
+      retries: 3
+      start_period: 10s
