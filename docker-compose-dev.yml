@@ -24,8 +24,32 @@ services:
       - ./flask:/flask:ro
     environment:
       FLASK_DEBUG: 1
-    ports:
-      - "5000:5000/tcp"
+    expose:
+      - 5000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flask.rule=Host(`192.168.1.112`)"
+      - "traefik.http.routers.flask.tls=true"
+      - "traefik.http.routers.flask.entrypoints=websecure"
+      - "traefik.http.services.flask.loadbalancer.server.port=5000"
     depends_on:
       - chromadb
+      - traefik
     command: ["/startup-dev.sh"]
+  
+  traefik:
+    build: ./traefik/
+    hostname: traefik
+    command:
+      - --api.insecure=true
+      - --providers.docker
+      - --providers.docker.exposedByDefault=false
+      - --providers.file.directory=/configuration/
+      - --entryPoints.websecure.address=:8448
+    ports:
+      - "8448:8448"
+      # web-UI dashboard, localhost:8080/dashboard
+      - "8080:8080"
+    volumes:
+      # so Traefik can listen to Docker events
+      - /var/run/docker.sock:/var/run/docker.sock

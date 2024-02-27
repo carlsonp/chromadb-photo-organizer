@@ -2,6 +2,8 @@ static/images/*
 !static/images/empty.txt
 .env
 chromadb-data/
+traefik/*.key
+traefik/*.crt
 
 
 
