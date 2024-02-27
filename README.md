@@ -41,7 +41,7 @@ Bring up all the services via Docker
 docker compose up -d --build
 ```
 
-Access the web-ui: http://<your IP or hostname>:8448
+Access the web-ui: `http://<your IP or hostname>:8448`
 
 ## For Developers
 
