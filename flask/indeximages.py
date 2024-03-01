@@ -3,7 +3,7 @@ from flask import Flask
 import chromadb
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from chromadb.utils.data_loaders import ImageLoader
-from utility import get_imgs, get_videos
+from utility import get_imgs, get_videos, convertVideoFormat
 from pathlib import Path
 
 def threaded_index(lock,app):
@@ -28,14 +28,16 @@ def threaded_index(lock,app):
             app.logger.info(detox_results)
 
             app.logger.info("Converting GIF files to MP4...")
-            # glob searching uses unix shell matching NOT regex
-            for vid in get_videos("/static/images", [], ["*.[gG][iI][fF$]"]):
-                if (not Path(f"{vid.removesuffix('.gif')}.mp4").is_file()):
-                    ffmpeg_results = subprocess.run(f"ffmpeg -i {vid} -hide_banner -loglevel error -movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' {vid.removesuffix('.gif')}.mp4", capture_output=True, shell=True)
-                    app.logger.info(ffmpeg_results)
-                    if (ffmpeg_results.returncode == 0):
-                        # delete the gif file
-                        os.remove(vid)
+            convertVideoFormat(app, "*.[gG][iI][fF$]", ".gif", ".mp4", "-movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2'", False)
+
+            app.logger.info("Converting GIF files to WEBM...")
+            convertVideoFormat(app, "*.[gG][iI][fF$]", ".gif", ".webm", "-movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2'", True)
+            
+            app.logger.info("Converting WEBM files to MP4...")
+            convertVideoFormat(app, "*.[wW][eE][bB][mM$]", ".webm", ".mp4", "", False)
+
+            app.logger.info("Converting MP4 files to WEBM...")
+            convertVideoFormat(app, "*.[mM][pP][4$]", ".mp4", ".webm", "", False)
 
             app.logger.info("Extracting images from video files...")
             for vid in get_videos("/static/images", []):

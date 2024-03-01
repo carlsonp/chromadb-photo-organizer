@@ -17,14 +17,16 @@
                     </a>
                 </div>
                 <div class="imgbox" id="imgbox">
-                    {% if value.endswith('.gif') or value.endswith('.png') or value.endswith('.jpg') %}
+                    {% if value.endswith('.gif') or value.endswith('.png') or value.endswith('.jpg') or value.endswith('.webp') %}
                         <img class="center-fit" alt="{{ value }}" src="{{ value }}" onclick="this.requestFullscreen()">
                     {% else %}
-                        <video class="center-fit" autoplay loop>
+                        <video class="center-fit" autoplay controls loop muted>
                             {% if value.endswith('.mp4') %}
+                                <source src="{{ value[:-4] }}.webm" type="video/webm">
                                 <source src="{{ value }}" type="video/mp4">
-                            {% else %}
+                            {% elif value.endswith('.webm') %}
                                 <source src="{{ value }}" type="video/webm">
+                                <source src="{{ value[:-5] }}.mp4" type="video/mp4">
                             {% endif %}
                             Your browser does not support the video tag.
                         </video> 

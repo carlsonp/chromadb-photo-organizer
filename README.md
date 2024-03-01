@@ -16,7 +16,7 @@ A photo similarity and organization tool leveraging the [chromadb](https://trych
 * Favorite and upvote images you like
 * Optionally cleanup file names
 * Extract images from animated files and videos (GIF, WEBM, MP4...)
-* Supports PNG, JPG, GIF, WEBM, MP4 files
+* Supports PNG, JPG, GIF, WEBM, MP4, WEBP files
 
 ## Installation and Setup
 

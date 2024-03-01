@@ -41,18 +41,21 @@
                 <br>
             {% endif %}
             {% if key == "relative_path" %}
+            <a class="btn btn-danger" href="/favorite?favorite={{ ids[outer_loop] }}">Favorite</a>
                 <a href="/favorite?favorite={{ ids[outer_loop] }}">
-                    {% if value.endswith('.gif') or value.endswith('.png') or value.endswith('.jpg') %}
+                    {% if value.endswith('.gif') or value.endswith('.png') or value.endswith('.jpg') or value.endswith('.webp') %}
                         <img class="img-fluid" alt="{{ value }}" src="{{ value }}">
                     {% else %}
-                        <video class="img-fluid" autoplay loop>
+                        <video class="img-fluid" autoplay controls loop muted>
                             {% if value.endswith('.mp4') %}
+                                <source src="{{ value[:-4] }}.webm" type="video/webm">
                                 <source src="{{ value }}" type="video/mp4">
-                            {% else %}
+                            {% elif value.endswith('.webm') %}
                                 <source src="{{ value }}" type="video/webm">
+                                <source src="{{ value[:-5] }}.mp4" type="video/mp4">
                             {% endif %}
                             Your browser does not support the video tag.
-                        </video> 
+                        </video>
                     {% endif %}
                 </a>
                 <br>
