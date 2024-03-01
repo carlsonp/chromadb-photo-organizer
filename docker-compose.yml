@@ -34,6 +34,13 @@ services:
       - "traefik.http.routers.flask.tls=true"
       - "traefik.http.routers.flask.entrypoints=websecure"
       - "traefik.http.services.flask.loadbalancer.server.port=5000"
+      # https://doc.traefik.io/traefik/middlewares/http/basicauth/
+      # Note: when used in docker-compose.yml all dollar signs in the hash need to be doubled for escaping.
+      # To create user:password pair, it's possible to use this command:
+      # echo $(htpasswd -nB admin) | sed -e s/\\$/\\$\\$/g
+      # default: admin:admin
+      - "traefik.http.routers.flask.middlewares=flaskauth"
+      - "traefik.http.middlewares.flaskauth.basicauth.users=admin:$$2y$$05$$6YrH.gY/u4FOtcfw8WgBqObDjR7383ryagIweunhYkno/i8vgclD6"
     depends_on:
       - chromadb
       - traefik

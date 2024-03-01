@@ -35,7 +35,11 @@ Or use Let's Encrypt or some other method.
 
 Edit the `./traefik/traefik.yaml` file and adjust the *.crt and *.key names as needed.
 
-Edit `docker-compose.yml` and adjut the Traefik IP address or hostname
+Edit `docker-compose.yml` and adjust:
+
+* The Traefik IP address or hostname
+* The HTTP basic auth or comment it out if you don't want to authenticate.  This is
+a very crude protection, add more protections if you need them
 
 Bring up all the services via Docker
 
