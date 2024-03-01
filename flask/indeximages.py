@@ -1,4 +1,4 @@
-import os, subprocess, sys
+import os, subprocess
 from flask import Flask
 import chromadb
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
