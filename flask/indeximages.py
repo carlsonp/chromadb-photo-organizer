@@ -27,29 +27,33 @@ def threaded_index(lock,app):
             detox_results = subprocess.run("detox -r -v /static/images/", capture_output=True, shell=True)
             app.logger.info(detox_results)
 
-            app.logger.info("Converting GIF files to MP4...")
-            convertVideoFormat(app, "*.[gG][iI][fF$]", ".gif", ".mp4", "-movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2'", False)
-
-            app.logger.info("Converting GIF files to WEBM...")
-            convertVideoFormat(app, "*.[gG][iI][fF$]", ".gif", ".webm", "-movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2'", True)
-            
-            app.logger.info("Converting WEBM files to MP4...")
-            convertVideoFormat(app, "*.[wW][eE][bB][mM$]", ".webm", ".mp4", "", False)
-
-            app.logger.info("Converting MP4 files to WEBM...")
-            convertVideoFormat(app, "*.[mM][pP][4$]", ".mp4", ".webm", "", False)
-
-            app.logger.info("Extracting images from video files...")
-            for vid in get_videos("/static/images", []):
-                if (not Path(f"{vid}.png").is_file()):
-                    if (vid.lower().endswith(".gif")):
-                        process_results = subprocess.run(f"convert '{vid}[0]' {vid}.png", capture_output=True, shell=True)
-                    else:
-                        # webm, mp4, etc.
-                        process_results = subprocess.run(f"ffmpeg -i {vid} -hide_banner -loglevel error -vf 'select=eq(n\,0)' -vframes 1 {vid}.png", capture_output=True, shell=True)
-                    app.logger.info(process_results)
-
             app.logger.info("Finished organizing files")
+
+        if (os.environ.get('CONVERT_GIF_TO_MP4') and os.environ.get('CONVERT_GIF_TO_MP4').lower() == "true"):
+            app.logger.info("Converting GIF files to MP4...")
+            convertVideoFormat(app, "*.[gG][iI][fF$]", ".gif", ".mp4", "-movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2'", bool(os.environ.get('DELETE_GIF_AFTER_CONVERSION')))
+
+        if (os.environ.get('CONVERT_GIF_TO_WEBM') and os.environ.get('CONVERT_GIF_TO_WEBM').lower() == "true"):
+            app.logger.info("Converting GIF files to WEBM...")
+            convertVideoFormat(app, "*.[gG][iI][fF$]", ".gif", ".webm", "-movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2'", bool(os.environ.get('DELETE_GIF_AFTER_CONVERSION')))
+            
+        if (os.environ.get('CONVERT_WEBM_TO_MP4') and os.environ.get('CONVERT_WEBM_TO_MP4').lower() == "true"):
+            app.logger.info("Converting WEBM files to MP4...")
+            convertVideoFormat(app, "*.[wW][eE][bB][mM$]", ".webm", ".mp4", "", bool(os.environ.get('DELETE_WEBM_AFTER_CONVERSION')))
+
+        if (os.environ.get('CONVERT_MP4_TO_WEBM') and os.environ.get('CONVERT_MP4_TO_WEBM').lower() == "true"):
+            app.logger.info("Converting MP4 files to WEBM...")
+            convertVideoFormat(app, "*.[mM][pP][4$]", ".mp4", ".webm", "", bool(os.environ.get('DELETE_MP4_AFTER_CONVERSION')))
+
+        app.logger.info("Extracting images from video files...")
+        for vid in get_videos("/static/images", []):
+            if (not Path(f"{vid}.png").is_file()):
+                if (vid.lower().endswith(".gif")):
+                    process_results = subprocess.run(f"convert '{vid}[0]' {vid}.png", capture_output=True, shell=True)
+                else:
+                    # webm, mp4, etc.
+                    process_results = subprocess.run(f"ffmpeg -i {vid} -hide_banner -loglevel error -vf 'select=eq(n\,0)' -vframes 1 {vid}.png", capture_output=True, shell=True)
+                app.logger.info(process_results)
 
         client = chromadb.HttpClient(host='chromadb', port=8000)
 
@@ -71,22 +75,11 @@ def threaded_index(lock,app):
         metadatas = []
         for p in image_uris:
             # add gif/video to the metadata path if the file exists, otherwise the static image
-            file_type = ""
             if (Path(p.removesuffix('.png')).is_file()):
                 animated_path = p.removesuffix('.png')
-                if (animated_path.lower().endswith(".mp4")):
-                    file_type = "video/mp4"
-                elif (animated_path.lower().endswith(".webm")):
-                    file_type = "video/webm"
-                metadatas.append({"relative_path": animated_path, "favoritecount": 0, "file_type": file_type})
+                metadatas.append({"relative_path": animated_path, "favoritecount": 0})
             else:
-                if (animated_path.lower().endswith(".png")):
-                    file_type = "image/png"
-                elif (animated_path.lower().endswith(".jpg") or animated_path.lower().endswith(".jpeg")):
-                    file_type = "image/jpeg"
-                elif (animated_path.lower().endswith(".gif")):
-                    file_type = "image/gif"
-                metadatas.append({"relative_path": p, "favoritecount": 0, "file_type": file_type})
+                metadatas.append({"relative_path": p, "favoritecount": 0})
         
         ids = image_uris
 
