@@ -6,7 +6,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && \
     DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata && \
-    apt install -y --no-install-recommends nano ca-certificates python3 python3-pip python3-flask curl detox imagemagick && \
+    apt install -y --no-install-recommends nano ca-certificates python3 python3-pip python3-flask curl detox imagemagick ffmpeg && \
     apt -y upgrade && \
     apt autoremove -y
 
@@ -19,6 +19,10 @@ HEALTHCHECK --interval=10s --timeout=5s --start-period=15s \
 COPY init-clip.py /
 
 RUN python3 /init-clip.py
+
+# these settings are extremely conservative, we need to bump up memory and processing
+# so we can handle larger image sizes during conversion
+RUN rm -f /etc/ImageMagick-6/policy.xml
 
 COPY startup-dev.sh /
 RUN chmod +x startup-dev.sh

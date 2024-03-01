@@ -17,7 +17,18 @@
                     </a>
                 </div>
                 <div class="imgbox" id="imgbox">
-                    <img class="center-fit" alt="{{ value }}" src="{{ value }}" onclick="this.requestFullscreen()">
+                    {% if value.endswith('.gif') or value.endswith('.png') or value.endswith('.jpg') %}
+                        <img class="center-fit" alt="{{ value }}" src="{{ value }}" onclick="this.requestFullscreen()">
+                    {% else %}
+                        <video class="center-fit" autoplay loop>
+                            {% if value.endswith('.mp4') %}
+                                <source src="{{ value }}" type="video/mp4">
+                            {% else %}
+                                <source src="{{ value }}" type="video/webm">
+                            {% endif %}
+                            Your browser does not support the video tag.
+                        </video> 
+                    {% endif %}
                 </div>
             {% endif %}
             {% if key == "favoritecount" %}
