@@ -63,10 +63,7 @@
         {% endfor %}
         
         <br>
-        <form method="post" class="similar" action="/similar">
-            <input type="hidden" id="similar" name="similar" value="{{ ids[loop.index0] }}" />
-            <button class="btn btn-info" type="similar">Similar Images</button>
-        </form>
+        <a class="btn btn-info" href="/similar?similar={{ids[ loop.index0] }}">Similar Images</a>
         </div>
     {% endfor %}
     </div>

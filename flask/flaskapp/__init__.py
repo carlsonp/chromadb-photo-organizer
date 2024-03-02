@@ -64,7 +64,7 @@ def create_app():
             app.logger.error(e)
             return "Failure searching"
     
-    @app.route('/similar', methods=['POST'])
+    @app.route('/similar')
     def similar():
         try:
             # finds images that are similar to a provided image
