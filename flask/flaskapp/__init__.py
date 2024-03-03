@@ -1,6 +1,7 @@
 import os, glob, random
 from flask import Flask, render_template, request
 from flask_compress import Compress
+from pathlib import Path
 import chromadb
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from chromadb.utils.data_loaders import ImageLoader
@@ -72,7 +73,9 @@ def create_app():
             embedding_function = OpenCLIPEmbeddingFunction()
             collection = client.get_or_create_collection(name='chromadb-photo-organizer', embedding_function=embedding_function)
 
-            query_image = np.array(Image.open(request.form.get('similar')))
+            if (not Path(request.args.get('similar')).is_absolute() or not request.args.get('similar').startswith("/static")):
+                return "Bad path"
+            query_image = np.array(Image.open(request.args.get('similar')))
             
             # https://docs.trychroma.com/usage-guide#querying-a-collection
             retrieved = collection.query(query_images=[query_image], include=['data', 'metadatas'], n_results=8)
@@ -151,6 +154,12 @@ def create_app():
     @app.route('/favorite')
     def favorite():
         try:
+            # basic defensive check against relative paths
+            for arg in ['upvote', 'downvote', 'favorite']:
+                if (request.args.get(arg)):
+                    if (not Path(request.args.get(arg)).is_absolute() or not request.args.get(arg).startswith("/static")):
+                        return "Bad path"
+
             # favorite images and see other images that are similar to it
             client = chromadb.HttpClient(host='chromadb', port=8000)
             embedding_function = OpenCLIPEmbeddingFunction()
