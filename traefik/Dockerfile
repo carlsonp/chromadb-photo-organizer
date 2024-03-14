@@ -1,4 +1,4 @@
-FROM traefik:v2.11
+FROM traefik:v3.0
 
 COPY *.crt /
 COPY *.key /
