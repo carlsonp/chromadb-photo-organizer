@@ -81,6 +81,13 @@ Cleanup and delete files by extension
 find . -type f -name '*.mp4' -exec rm -f {} \;
 ```
 
+Cleanup and delete duplicate files
+
+```shell
+fdupes -r -d ./static/images/
+# mark the files you want to keep, then type "prune"
+```
+
 ## References
 
 * https://docs.trychroma.com/deployment
