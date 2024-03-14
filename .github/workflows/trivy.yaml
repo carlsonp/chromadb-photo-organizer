@@ -40,6 +40,9 @@ jobs:
           # https://docs.docker.com/build/ci/github-actions/cache/
           #cache-from: type=registry,ref=ghcr.io/carlsonp/chromadb-photo-organizer:latest
           #cache-to: type=inline
+          # cache to Github
+          cache-from: type=gha
+          cache-to: type=gha
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
       - name: Run Trivy vulnerability scanner
