@@ -1,4 +1,4 @@
-import os, glob, random
+import os, glob, random, subprocess
 from flask import Flask, render_template, request
 from flask_compress import Compress
 from pathlib import Path
@@ -150,6 +150,19 @@ def create_app():
             return "Index does not exist to delete"
 
         return render_template('index.html', textmessage="Index deleted")
+
+    @app.route('/duplicates')
+    def duplicates():
+        try:
+            duplicate_results = subprocess.run("fdupes -r -q -S /static/images/", capture_output=True, shell=True)
+            if (duplicate_results.returncode != 0):
+                raise Exception("Fdupes return code failed")
+            duplicate_results_list = duplicate_results.stdout.decode("utf-8").split("\n")
+        except Exception as e:
+            app.logger.error(e)
+            return "Error checking for duplicate files"
+
+        return render_template('duplicates.html', duplicate_results=duplicate_results_list)
     
     @app.route('/favorite')
     def favorite():

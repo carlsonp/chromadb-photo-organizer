@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3>Duplicate Files</h3>
+    <br>
+    <ul>
+    {% for result in duplicate_results %}
+        <li>
+            {{ result }}
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
