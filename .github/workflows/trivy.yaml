@@ -30,22 +30,36 @@ jobs:
         run: |
           df -h
           docker system df
+      # adapted from: https://github.com/easimon/maximize-build-space/blob/master/action.yml
+      - name: Clear some space
+        shell: bash
+        # Removes .NET runtime and libraries. (frees ~17 GB)
+        # Removes Android SDKs and Tools. (frees ~11 GB)
+        # Removes GHC (Haskell) artifacts. (frees ~2.7 GB)
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+      - name: Check disk space post cleanup
+        run: |
+          df -h
+          docker system df
       - name: Build and push docker
         id: docker_build
         # https://github.com/docker/build-push-action
         uses: docker/build-push-action@v5
         with:
           context: "{{defaultContext}}:flask"
-          push: true
+          push: false
           tags: ghcr.io/carlsonp/chromadb-photo-organizer:latest
           # Load is a shorthand for --output=type=docker (default false)
-          # load: true
+          load: true
           # https://docs.docker.com/build/ci/github-actions/cache/
-          cache-from: type=registry,ref=ghcr.io/carlsonp/chromadb-photo-organizer:latest
-          cache-to: type=inline
+          # cache-from: type=registry,ref=ghcr.io/carlsonp/chromadb-photo-organizer:latest
+          # cache-to: type=inline
           # cache to Github
-          # cache-from: type=gha
-          # cache-to: type=gha
+          cache-from: type=gha
+          cache-to: type=gha
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
       - name: Run Trivy vulnerability scanner
