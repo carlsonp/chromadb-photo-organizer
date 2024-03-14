@@ -32,7 +32,7 @@ services:
       - 5000
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.flask.rule=Host(`192.168.1.112`)"
+      - "traefik.http.routers.flask.rule=Host(`127.0.0.1`, `localhost`, `192.168.1.112`)"
       - "traefik.http.routers.flask.tls=true"
       - "traefik.http.routers.flask.entrypoints=websecure"
       - "traefik.http.services.flask.loadbalancer.server.port=5000"
