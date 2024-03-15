@@ -30,7 +30,7 @@
     {% if metadatas is defined and metadatas|length == 0 %}
         <div class="alert alert-warning" role="alert">No results</div>
     {% endif %}
-    
+
     <div class="row">
     {% for dict_item in metadatas %}
         {% set outer_loop = loop.index0 %}
@@ -61,7 +61,7 @@
                 <br>
             {% endif %}
         {% endfor %}
-        
+
         <br>
         <a class="btn btn-info" href="/similar?similar={{ids[ loop.index0] }}">Similar Images</a>
         </div>

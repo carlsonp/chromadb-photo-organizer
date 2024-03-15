@@ -58,6 +58,12 @@ Local development and testing
 docker compose -f docker-compose-dev.yml up -d --build
 ```
 
+For file formatting and cleanup
+
+```shell
+pre-commit run --all-files
+```
+
 Use the `detox` utility to mass fix filenames, remove special characters, spaces, etc.
 
 ```shell

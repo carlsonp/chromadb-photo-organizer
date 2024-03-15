@@ -2,12 +2,18 @@
 
 {% block content %}
     <h3>Duplicate Files</h3>
-    <br>
-    <ul>
-    {% for result in duplicate_results %}
-        <li>
-            {{ result }}
-        </li>
-    {% endfor %}
-    </ul>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <br>
+                <ul class="list-group">
+                {% for result in duplicate_results %}
+                    <li class="list-group-item" style="word-break: break-all;">
+                        {{ result }}
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
 {% endblock %}

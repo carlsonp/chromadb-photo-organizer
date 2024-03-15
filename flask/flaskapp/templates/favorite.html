@@ -29,7 +29,7 @@
                                 <source src="{{ value[:-5] }}.mp4" type="video/mp4">
                             {% endif %}
                             Your browser does not support the video tag.
-                        </video> 
+                        </video>
                     {% endif %}
                 </div>
             {% endif %}
@@ -42,7 +42,7 @@
         var myElement = document.getElementById('imgbox');
         var mc = new Hammer(myElement);
         mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
-    
+
         mc.on("swipeleft swiperight swipeup", function(ev) {
             if (ev.type == "swipeleft") {
                 window.location.href = "/favorite?downvote={{ id }}";

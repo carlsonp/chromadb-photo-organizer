@@ -11,9 +11,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt autoremove -y
 
 # https://docs.docker.com/build/guide/mounts/#add-a-cache-mount
-RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked pip3 install --user chromadb open-clip-torch gunicorn flask-compress
+RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked pip3 install --user chromadb open-clip-torch gunicorn flask-compress humanize
 
-HEALTHCHECK --interval=10s --timeout=5s --start-period=15s \ 
+HEALTHCHECK --interval=10s --timeout=5s --start-period=15s \
    CMD curl --fail localhost:5000/health || exit 1
 
 COPY init-clip.py /

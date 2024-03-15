@@ -47,7 +47,7 @@ services:
       - chromadb
       - traefik
     command: ["/startup-dev.sh"]
-  
+
   traefik:
     build: ./traefik/
     hostname: traefik
