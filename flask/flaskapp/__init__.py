@@ -1,5 +1,3 @@
-import glob
-import os
 import random
 import subprocess
 import threading
@@ -12,7 +10,7 @@ from chromadb.utils.data_loaders import ImageLoader
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from flask_compress import Compress
 from indeximages import threaded_index
-from PIL import ExifTags, Image
+from PIL import Image
 from PIL.ExifTags import TAGS
 from utility import get_imgs
 

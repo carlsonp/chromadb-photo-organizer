@@ -7,8 +7,6 @@ from chromadb.utils.data_loaders import ImageLoader
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from utility import convertVideoFormat, get_imgs, get_videos
 
-from flask import Flask
-
 
 def threaded_index(lock, app):
     try:
