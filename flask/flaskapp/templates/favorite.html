@@ -4,16 +4,66 @@
     <br>
     {% for dict_item in metadatas %}
         {% for key, value in dict_item.items() %}
+            {% if key == "favoritecount" %}
+                <div style="text-align:center;"><iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon>Favorite Votes: <strong>{{ value }}</strong></div>
+            {% endif %}
+            {% if key == "tags" %}
+                <div class="d-flex flex-wrap justify-content-center">
+                    <div class="p-2">
+                        Tags:
+                    </div>
+                    {% if value != "" %}
+                        {% for tag in value.split(",") %}
+                            <div class="p-2">
+                                <form method="post" class="mx-1" role="deletetag" action="/deletetag">
+                                    <input type="hidden" id="id" name="id" value="{{ id }}">
+                                    <input type="hidden" id="tag" name="tag" value="{{ tag }}">
+                                    <button type="submit" class="btn btn-secondary">
+                                        <iconify-icon icon="material-symbols:remove"></iconify-icon> {{ tag }}
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="p-2">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tagModal">
+                            <iconify-icon icon="material-symbols:add"></iconify-icon> Add Tag
+                        </button>
+                    </div>
+                </div>
+                <div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="tagModalLabel">Add Tag</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addtagform" class="d-flex" role="addtag">
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" id="tag" name="tag" aria-label="tag">
+                                        <input type="hidden" id="id" name="id" value="{{ id }}">
+                                        <button type="button" id="addtag" class="btn btn-primary">Add Tag</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             {% if key == "relative_path" %}
                 <div style="text-align:center;">
                     <a href="/favorite?downvote={{ id }}">
-                        <button class="btn btn-danger"><iconify-icon icon="material-symbols:keyboard-arrow-left"></iconify-icon>Downvote</button>
+                        <button class="btn btn-danger"><iconify-icon icon="material-symbols:keyboard-arrow-left"></iconify-icon>Downvote <iconify-icon style="color:black;" icon="material-symbols:heart-broken"></iconify-icon></button>
                     </a>
                     <a href="/favorite">
                         <button class="btn btn-info"><iconify-icon icon="material-symbols:keyboard-arrow-up"></iconify-icon> Random <iconify-icon icon="material-symbols:keyboard-arrow-up"></iconify-icon></button>
                     </a>
                     <a href="/favorite?upvote={{ id }}">
-                        <button class="btn btn-success">Upvote<iconify-icon icon="material-symbols:keyboard-arrow-right"></iconify-icon></button>
+                        <button class="btn btn-success"><iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon> Upvote<iconify-icon icon="material-symbols:keyboard-arrow-right"></iconify-icon></button>
                     </a>
                 </div>
                 <div class="imgbox" id="imgbox">
@@ -33,9 +83,6 @@
                     {% endif %}
                 </div>
             {% endif %}
-            {% if key == "favoritecount" %}
-                <div style="text-align:center;"><iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon>Favorite Votes: <strong>{{ value }}</strong></div>
-            {% endif %}
         {% endfor %}
     {% endfor %}
     <script>
@@ -51,6 +98,24 @@
             } else if (ev.type == "swipeup") {
                 window.location.href = "/favorite";
             }
+        });
+
+        document.getElementById('addtag').addEventListener('click', function() {
+            var form = document.getElementById('addtagform');
+            var formData = new FormData(form);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/addtag', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var tagmodal = new bootstrap.Modal(document.getElementById('tagModal'));
+                        tagmodal.hide();
+                        location.reload();
+                    }
+                }
+            };
+            xhr.send(formData);
         });
     </script>
     {% if exif != None %}

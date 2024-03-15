@@ -14,7 +14,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 from utility import get_imgs
 
-from flask import Flask, render_template, request
+from flask import Flask, redirect, render_template, request, url_for
 
 # used for locking the index so we only run one at a time
 lock = threading.Lock()
@@ -102,6 +102,87 @@ def create_app():
         except Exception as e:
             app.logger.error(e)
             return "Failure searching"
+
+    @app.route("/addtag", methods=["POST"])
+    def addtag():
+        try:
+            # adds a tag to chromadb
+            client = chromadb.HttpClient(host="chromadb", port=8000)
+            embedding_function = OpenCLIPEmbeddingFunction()
+            collection = client.get_or_create_collection(
+                name="chromadb-photo-organizer", embedding_function=embedding_function
+            )
+
+            retrieved = collection.get(ids=[request.form["id"]], include=["metadatas"])
+            if request.form["tag"] not in retrieved["metadatas"][0]["tags"].split(","):
+                if retrieved["metadatas"][0]["tags"] == "":
+                    retrieved["metadatas"][0]["tags"] = request.form["tag"].replace(
+                        ",", ""
+                    )
+                else:
+                    retrieved["metadatas"][0]["tags"] = (
+                        retrieved["metadatas"][0]["tags"]
+                        + ","
+                        + request.form["tag"].replace(",", "")
+                    )
+
+                collection.update(
+                    ids=[request.form["id"]], metadatas=retrieved["metadatas"]
+                )
+                return "Tag added"
+            else:
+                return "Tag already exists"
+        except Exception as e:
+            app.logger.error(e)
+            return "Failure adding tag"
+
+    @app.route("/deletetag", methods=["POST"])
+    def deletetag():
+        try:
+            # deletes a tag in chromadb
+            client = chromadb.HttpClient(host="chromadb", port=8000)
+            embedding_function = OpenCLIPEmbeddingFunction()
+            collection = client.get_or_create_collection(
+                name="chromadb-photo-organizer", embedding_function=embedding_function
+            )
+
+            retrieved = collection.get(ids=[request.form["id"]], include=["metadatas"])
+            if request.form["tag"] in retrieved["metadatas"][0]["tags"]:
+                retrieved["metadatas"][0]["tags"] = retrieved["metadatas"][0][
+                    "tags"
+                ].replace(request.form["tag"], "")
+                if ",," in retrieved["metadatas"][0]["tags"]:
+                    retrieved["metadatas"][0]["tags"] = retrieved["metadatas"][0][
+                        "tags"
+                    ].replace(",,", ",")
+                if retrieved["metadatas"][0]["tags"].startswith(","):
+                    retrieved["metadatas"][0]["tags"] = retrieved["metadatas"][0][
+                        "tags"
+                    ][1:]
+                if retrieved["metadatas"][0]["tags"].endswith(","):
+                    retrieved["metadatas"][0]["tags"] = retrieved["metadatas"][0][
+                        "tags"
+                    ][:1]
+                if retrieved["metadatas"][0]["tags"] == ",":
+                    retrieved["metadatas"][0]["tags"] = ""
+
+                collection.update(
+                    ids=[request.form["id"]], metadatas=retrieved["metadatas"]
+                )
+                # force HTTPS overwise it defaults to HTTP
+                return redirect(
+                    url_for(
+                        "favorite",
+                        favorite=request.form["id"],
+                        _scheme="https",
+                        _external=True,
+                    )
+                )
+            else:
+                return "Tag doesn't exist"
+        except Exception as e:
+            app.logger.error(e)
+            return "Failure removing tag"
 
     @app.route("/similar")
     def similar():
@@ -314,6 +395,13 @@ def create_app():
                 img_exif.update({tag: img.getexif().get(tag_id)})
             if not img_exif:
                 img_exif = None
+
+            # reorder metadata dictionary
+            desired_order_list = ["favoritecount", "tags", "relative_path"]
+            reordered_dict = {
+                k: retrieved["metadatas"][0][k] for k in desired_order_list
+            }
+            retrieved["metadatas"][0] = reordered_dict
 
             return render_template(
                 "favorite.html",

@@ -40,6 +40,16 @@
                 <iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon>Favorite Votes: <strong>{{ value }}</strong>
                 <br>
             {% endif %}
+            {% if key == "tags" and value != "" %}
+                Tags:
+                {% for tag in value.split(",") %}
+                    {% if not loop.last %}
+                        <strong>{{ tag }}, </strong>
+                    {% else %}
+                        <strong>{{ tag }}</strong>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
             {% if key == "relative_path" %}
             <a class="btn btn-danger" href="/favorite?favorite={{ ids[outer_loop] }}">Favorite</a>
                 <a href="/favorite?favorite={{ ids[outer_loop] }}">

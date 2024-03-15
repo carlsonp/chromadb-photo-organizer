@@ -133,9 +133,11 @@ def threaded_index(lock, app):
             # add gif/video to the metadata path if the file exists, otherwise the static image
             if Path(p.removesuffix(".png")).is_file():
                 animated_path = p.removesuffix(".png")
-                metadatas.append({"relative_path": animated_path, "favoritecount": 0})
+                metadatas.append(
+                    {"relative_path": animated_path, "favoritecount": 0, "tags": ""}
+                )
             else:
-                metadatas.append({"relative_path": p, "favoritecount": 0})
+                metadatas.append({"relative_path": p, "favoritecount": 0, "tags": ""})
 
         ids = image_uris
 
