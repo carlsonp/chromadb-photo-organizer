@@ -1,17 +1,22 @@
-import os, glob, random, subprocess
-from flask import Flask, render_template, request
-from flask_compress import Compress
-from pathlib import Path
-import humanize
-import chromadb
-from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
-from chromadb.utils.data_loaders import ImageLoader
+import glob
+import os
+import random
+import subprocess
 import threading
-from indeximages import threaded_index
-from PIL import Image, ExifTags
-from PIL.ExifTags import TAGS
+from pathlib import Path
+
+import chromadb
+import humanize
 import numpy as np
+from chromadb.utils.data_loaders import ImageLoader
+from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
+from flask_compress import Compress
+from indeximages import threaded_index
+from PIL import ExifTags, Image
+from PIL.ExifTags import TAGS
 from utility import get_imgs
+
+from flask import Flask, render_template, request
 
 # used for locking the index so we only run one at a time
 lock = threading.Lock()

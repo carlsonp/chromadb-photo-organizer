@@ -1,10 +1,13 @@
-import os, subprocess
-from flask import Flask
-import chromadb
-from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
-from chromadb.utils.data_loaders import ImageLoader
-from utility import get_imgs, get_videos, convertVideoFormat
+import os
+import subprocess
 from pathlib import Path
+
+import chromadb
+from chromadb.utils.data_loaders import ImageLoader
+from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
+from utility import convertVideoFormat, get_imgs, get_videos
+
+from flask import Flask
 
 
 def threaded_index(lock, app):
