@@ -39,10 +39,23 @@ def create_app():
                 if f.is_file()
             )
 
+            breakdownbyextensionlist = []
+            for extension in [".jpg", ".png", ".mp4", ".webm", ".webp", ".gif"]:
+                extension_bytes = sum(
+                    f.stat().st_size
+                    for f in Path("/static/images/").glob(f"**/*{extension}")
+                    if f.is_file()
+                )
+                if extension_bytes != 0:
+                    breakdownbyextensionlist.append(
+                        f"{extension}: {humanize.naturalsize(extension_bytes)}"
+                    )
+
             return render_template(
                 "index.html",
                 numberimages=collection.count(),
                 imagesize=humanize.naturalsize(image_bytes),
+                breakdownbyextensionlist=breakdownbyextensionlist,
             )
         except Exception as e:
             app.logger.error(e)

@@ -13,7 +13,12 @@
             {% endif %}
             <br>
             {% if imagesize is defined %}
-                <strong>{{ imagesize }}</strong> of content
+                <strong>{{ imagesize }}</strong> of content<br>
+            {% endif %}
+            {% if breakdownbyextensionlist is defined %}
+                {% for ext in breakdownbyextensionlist %}
+                    {{ ext }}<br>
+                {% endfor %}
             {% endif %}
             {% if textmessage is defined %}
             <div class="alert alert-success" role="alert">{{ textmessage }}</div>
