@@ -42,7 +42,7 @@ def create_app():
             return render_template(
                 "index.html",
                 numberimages=collection.count(),
-                imagesize=humanize.naturalsize(image_bytes, binary=True),
+                imagesize=humanize.naturalsize(image_bytes),
             )
         except Exception as e:
             app.logger.error(e)
