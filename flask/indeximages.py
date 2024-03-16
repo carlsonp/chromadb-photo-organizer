@@ -25,10 +25,10 @@ def threaded_index(lock, app):
                         os.rename(f, f.replace(replaceme, ""))
 
             # rename jpeg to jpg
-            for f in list(get_imgs("/static/images", [])):
+            for f in list(get_imgs("/static/images", [], ["*.[jJ][pP][eE][gG$]"])):
                 if f.lower().endswith(".jpeg"):
-                    # https://stackoverflow.com/questions/9943504/right-to-left-string-replace-in-python
-                    os.rename(f, "jpg".join(f.rsplit(".jpeg", 1)))
+                    name, old_extension = f.rsplit(".", 1)
+                    os.rename(f, name + "." + "jpg")
 
             app.logger.info("Running detox...")
             detox_results = subprocess.run(
