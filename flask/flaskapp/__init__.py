@@ -33,23 +33,19 @@ def create_app():
                 name="chromadb-photo-organizer", embedding_function=embedding_function
             )
 
-            image_bytes = sum(
-                f.stat().st_size
-                for f in Path("/static/images/").glob("**/*")
-                if f.is_file()
-            )
+            image_bytes = 0
+            breakdownbyextensiondict = {}
+            for f in Path("/static/images/").glob("**/*"):
+                if f.is_file():
+                    if f.suffix in breakdownbyextensiondict:
+                        breakdownbyextensiondict[f.suffix] += f.stat().st_size
+                    else:
+                        breakdownbyextensiondict[f.suffix] = f.stat().st_size
+                    image_bytes += f.stat().st_size
 
             breakdownbyextensionlist = []
-            for extension in [".jpg", ".png", ".mp4", ".webm", ".webp", ".gif"]:
-                extension_bytes = sum(
-                    f.stat().st_size
-                    for f in Path("/static/images/").glob(f"**/*{extension}")
-                    if f.is_file()
-                )
-                if extension_bytes != 0:
-                    breakdownbyextensionlist.append(
-                        f"{extension}: {humanize.naturalsize(extension_bytes)}"
-                    )
+            for key,value in breakdownbyextensiondict.items():
+                breakdownbyextensionlist.append(f"{key}: {humanize.naturalsize(value)}")
 
             return render_template(
                 "index.html",
