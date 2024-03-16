@@ -44,7 +44,7 @@ def create_app():
                     image_bytes += f.stat().st_size
 
             breakdownbyextensionlist = []
-            for key,value in breakdownbyextensiondict.items():
+            for key, value in breakdownbyextensiondict.items():
                 breakdownbyextensionlist.append(f"{key}: {humanize.naturalsize(value)}")
 
             return render_template(
