@@ -50,6 +50,10 @@ docker compose up -d --build
 Access the web-ui: `https://<your IP or hostname>:8448` via your browser.
 You may need to accept the cert if it's self-signed.
 
+Go into the Admin page and start the index, this will process your
+files and store indexed versions of the data and metadata in the Chroma
+database.
+
 ## For Developers
 
 Local development and testing
