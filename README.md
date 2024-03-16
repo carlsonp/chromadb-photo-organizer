@@ -52,7 +52,8 @@ You may need to accept the cert if it's self-signed.
 
 Go into the Admin page and start the index, this will process your
 files and store indexed versions of the data and metadata in the Chroma
-database.
+database.  This can take a substantial amount of time, particularly
+for file conversions, be patient.
 
 ## For Developers
 
