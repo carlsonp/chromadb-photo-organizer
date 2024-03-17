@@ -169,6 +169,11 @@ def threaded_index(lock, app):
                     f"Removing image: {img} from ChromaDB as it no longer exists on disk"
                 )
                 collection.delete(ids=[img])
+            if not Path(img.removesuffix(".png")).is_file():
+                app.logger.info(
+                    f"Removing image: {img.removesuffix('.png')} from ChromaDB as it no longer exists on disk"
+                )
+                collection.delete(ids=[img.removesuffix(".png")])
 
         app.logger.info("Finished indexing images")
         lock.release()
