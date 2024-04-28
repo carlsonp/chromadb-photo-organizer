@@ -303,6 +303,42 @@ def create_app():
             app.logger.error(e)
             return "Failure getting filtered images"
 
+    @app.route("/mightlike")
+    def mightlike():
+        try:
+            client = chromadb.HttpClient(host="chromadb", port=8000)
+            embedding_function = OpenCLIPEmbeddingFunction()
+            data_loader = ImageLoader()
+            collection = client.get_or_create_collection(
+                name="chromadb-photo-organizer",
+                embedding_function=embedding_function,
+                data_loader=data_loader,
+            )
+
+            retrieved = collection.get(
+                include=["embeddings"], where={"favoritecount": {"$gte": 1}}
+            )
+
+            # https://docs.trychroma.com/usage-guide#querying-a-collection
+            # find new images based on the embeddings that haven't been voted on
+            retrieved = collection.query(
+                query_embeddings=retrieved["embeddings"],
+                include=["data", "metadatas"],
+                n_results=8,
+                where={"favoritecount": {"$eq": 0}},
+            )
+
+            return render_template(
+                "results.html",
+                ids=retrieved["ids"][0],
+                imageuris=retrieved["uris"][0],
+                metadatas=retrieved["metadatas"][0],
+            )
+
+        except Exception as e:
+            app.logger.error(e)
+            return "Failure getting images you might like"
+
     @app.route("/deleteindex")
     def deleteindex():
         # existing items don't seem to have metadata updated so in some cases it's easier just to blow it away
