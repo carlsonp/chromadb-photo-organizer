@@ -319,10 +319,13 @@ def create_app():
                 include=["embeddings"], where={"favoritecount": {"$gte": 1}}
             )
 
+            # average all the embeddings into one value to then search on
+            average_embedding = np.mean(retrieved["embeddings"], axis=0).tolist()
+
             # https://docs.trychroma.com/usage-guide#querying-a-collection
             # find new images based on the embeddings that haven't been voted on
             retrieved = collection.query(
-                query_embeddings=retrieved["embeddings"],
+                query_embeddings=[average_embedding],
                 include=["data", "metadatas"],
                 n_results=8,
                 where={"favoritecount": {"$eq": 0}},
