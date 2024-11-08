@@ -104,7 +104,7 @@ def threaded_index(lock, app):
                 else:
                     # webm, mp4, etc.
                     process_results = subprocess.run(
-                        f"ffmpeg -i {vid} -hide_banner -loglevel error -vf 'select=eq(n\,0)' -vframes 1 {vid}.png",
+                        f"ffmpeg -i {vid} -hide_banner -loglevel error -vf 'select=eq(n,0)' -vframes 1 {vid}.png",
                         capture_output=True,
                         shell=True,
                     )
