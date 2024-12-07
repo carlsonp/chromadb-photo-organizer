@@ -9,6 +9,7 @@ import numpy as np
 from chromadb.utils.data_loaders import ImageLoader
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from flask_compress import Compress
+from flask_socketio import SocketIO
 from indeximages import threaded_index
 from PIL import Image
 from PIL.ExifTags import TAGS
@@ -23,6 +24,7 @@ lock = threading.Lock()
 def create_app():
     app = Flask(__name__, instance_relative_config=True, static_folder="/static/")
     Compress(app)
+    socketio = SocketIO(app)
 
     @app.route("/")
     def homepage():
@@ -70,12 +72,13 @@ def create_app():
                     args=(
                         lock,
                         app,
+                        socketio,
                     ),
                 )
                 thread.daemon = True
                 thread.start()
                 return render_template(
-                    "index.html", textmessage="Started indexing images"
+                    "indeximages.html", textmessage="Started indexing images"
                 )
             else:
                 return render_template(
@@ -445,7 +448,7 @@ def create_app():
                 img_exif = None
 
             # reorder metadata dictionary
-            desired_order_list = ["favoritecount", "tags", "relative_path"]
+            desired_order_list = ["favoritecount", "caption", "tags", "relative_path"]
             reordered_dict = {
                 k: retrieved["metadatas"][0][k] for k in desired_order_list
             }

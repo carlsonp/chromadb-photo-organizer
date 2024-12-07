@@ -15,14 +15,15 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # https://docs.docker.com/build/guide/mounts/#add-a-cache-mount
-RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked pip3 install chromadb open-clip-torch gunicorn flask-compress humanize
+RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked pip3 install chromadb open-clip-torch gunicorn flask-compress humanize transformers einops flask-socketio
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=15s \
    CMD curl --fail localhost:5000/health || exit 1
 
 COPY init-clip.py /
+COPY init-florence.py /
 
-RUN --mount=type=cache,target=/root/.cache/huggingface/hub/,sharing=locked python3 /init-clip.py
+RUN --mount=type=cache,target=/root/.cache/huggingface/hub/,sharing=locked python3 /init-clip.py && python3 /init-florence.py
 
 # these settings are extremely conservative, we need to bump up memory and processing
 # so we can handle larger image sizes during conversion

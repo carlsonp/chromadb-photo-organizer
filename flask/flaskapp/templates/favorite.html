@@ -7,6 +7,15 @@
             {% if key == "favoritecount" %}
                 <div style="text-align:center;"><iconify-icon style="color:red;" icon="material-symbols:favorite"></iconify-icon>Favorite Votes: <strong>{{ value }}</strong></div>
             {% endif %}
+            {% if key == "caption" %}
+            <div class="d-flex flex-wrap justify-content-center">
+                <div class="p-2">
+                    {% if value != "" %}
+                        {{ value }}
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
             {% if key == "tags" %}
                 <div class="d-flex flex-wrap justify-content-center">
                     <div class="p-2">
