@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   chromadb:
     # https://github.com/chroma-core/chroma/blob/main/docker-compose.yml
