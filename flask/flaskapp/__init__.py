@@ -1,6 +1,6 @@
 import random
 import subprocess
-import threading
+import os
 from pathlib import Path
 
 import chromadb
@@ -9,22 +9,23 @@ import numpy as np
 from chromadb.utils.data_loaders import ImageLoader
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from flask_compress import Compress
-from flask_socketio import SocketIO
-from indeximages import threaded_index
 from PIL import Image
 from PIL.ExifTags import TAGS
 from utility import get_imgs
 
+from redis import Redis
+from rq import Queue
+
+from worker_jobs import organize_files, convert_gif_to_mp4, convert_gif_to_webm, convert_webm_to_mp4, convert_mp4_to_webm, extract_images_videos, generate_captions
+
 from flask import Flask, redirect, render_template, request, url_for
 
-# used for locking the index so we only run one at a time
-lock = threading.Lock()
+q = Queue(connection=Redis(host="valkey", port=6379))
 
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True, static_folder="/static/")
     Compress(app)
-    socketio = SocketIO(app)
 
     @app.route("/")
     def homepage():
@@ -66,24 +67,45 @@ def create_app():
     @app.route("/index")
     def index():
         try:
-            if not lock.locked():
-                thread = threading.Thread(
-                    target=threaded_index,
-                    args=(
-                        lock,
-                        app,
-                        socketio,
-                    ),
-                )
-                thread.daemon = True
-                thread.start()
-                return render_template(
-                    "indeximages.html", textmessage="Started indexing images"
-                )
-            else:
-                return render_template(
-                    "index.html", textmessage="Index already running"
-                )
+            if (
+                os.environ.get("ORGANIZE_FILES")
+                and os.environ.get("ORGANIZE_FILES").lower() == "true"
+            ):
+                q.enqueue(organize_files)
+
+            if (
+                os.environ.get("CONVERT_GIF_TO_MP4")
+                and os.environ.get("CONVERT_GIF_TO_MP4").lower() == "true"
+            ):
+                q.enqueue(convert_gif_to_mp4)
+            
+            if (
+                os.environ.get("CONVERT_GIF_TO_WEBM")
+                and os.environ.get("CONVERT_GIF_TO_WEBM").lower() == "true"
+            ):
+                q.enqueue(convert_gif_to_webm)
+
+            if (
+                os.environ.get("CONVERT_WEBM_TO_MP4")
+                and os.environ.get("CONVERT_WEBM_TO_MP4").lower() == "true"
+            ):
+                q.enqueue(convert_webm_to_mp4)
+
+            if (
+                os.environ.get("CONVERT_MP4_TO_WEBM")
+                and os.environ.get("CONVERT_MP4_TO_WEBM").lower() == "true"
+            ):
+                q.enqueue(convert_mp4_to_webm)
+
+            q.enqueue(extract_images_videos)
+
+            if (
+                os.environ.get("GENERATE_CAPTIONS")
+                and os.environ.get("GENERATE_CAPTIONS").lower() == "true"
+            ):
+                q.enqueue(generate_captions)
+
+            return render_template("indeximages.html")
         except Exception as e:
             app.logger.error(e)
             return "Failure indexing"
@@ -114,6 +136,10 @@ def create_app():
         except Exception as e:
             app.logger.error(e)
             return "Failure searching"
+    
+    @app.route("/tasks")
+    def tasks():
+        return render_template("tasks.html", tasks=q.jobs)
 
     @app.route("/addtag", methods=["POST"])
     def addtag():

@@ -54,7 +54,29 @@ services:
     depends_on:
       - chromadb
       - traefik
+      - worker
     command: ["/startup-dev.sh"]
+
+  valkey:
+    image: valkey/valkey:latest
+    restart: unless-stopped
+    hostname: valkey
+
+  worker:
+    build:
+      context: ./flask/
+      dockerfile: Dockerfile_Worker
+      args:
+        DOCKER_BUILDKIT: 1
+    hostname: worker
+    restart: unless-stopped
+    environment:
+      TZ: America/Chicago
+    depends_on:
+      - valkey
+    volumes:
+      - ./static:/static:rw
+      - ./flask:/flask:ro
 
   traefik:
     build: ./traefik/

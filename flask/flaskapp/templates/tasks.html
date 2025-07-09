@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Enqueued Tasks</h2>
+    <p><iconify-icon icon="material-symbols:info" style="font-size: 30px;"></iconify-icon>
+        These are backend tasks that happen behind the scenes.
+        As you interact with the application, tasks may be queued here.
+    </p>
+    <br>
+
+    {% if tasks %}
+    <ul>
+        {% for task in tasks %}
+        <li>
+            <strong>ID:</strong> {{ task.id }} <br>
+            <strong>Func:</strong> {{ task.func_name }} <br>
+            <strong>Args:</strong> {{ task.args }} <br>
+            <strong>Status:</strong> {{ task.get_status() }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No tasks in the queue.</p>
+    {% endif %}
+
+</div>
+{% endblock %}
