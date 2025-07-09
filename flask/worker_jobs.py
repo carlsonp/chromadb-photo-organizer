@@ -41,7 +41,6 @@ def convert_gif_to_mp4():
     try:
         print("Converting GIF files to MP4...")
         convertVideoFormat(
-            app,
             "*.[gG][iI][fF$]",
             ".gif",
             ".mp4",
@@ -56,7 +55,6 @@ def convert_gif_to_webm():
     try:
         print("Converting GIF files to WEBM...")
         convertVideoFormat(
-            app,
             "*.[gG][iI][fF$]",
             ".gif",
             ".webm",
@@ -71,7 +69,6 @@ def convert_webm_to_mp4():
     try:
         print("Converting WEBM files to MP4...")
         convertVideoFormat(
-            app,
             "*.[wW][eE][bB][mM$]",
             ".webm",
             ".mp4",
@@ -86,7 +83,6 @@ def convert_mp4_to_webm():
     try:
         print("Converting MP4 files to WEBM...")
         convertVideoFormat(
-            app,
             "*.[mM][pP][4$]",
             ".mp4",
             ".webm",

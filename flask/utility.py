@@ -39,7 +39,6 @@ def get_videos(
 
 
 def convertVideoFormat(
-    app,
     searchpattern: str,
     sourcetype: str,
     endtype: str,
@@ -54,7 +53,7 @@ def convertVideoFormat(
                 capture_output=True,
                 shell=True,
             )
-            app.logger.info(ffmpeg_results)
+            print(ffmpeg_results)
             if deletesource and ffmpeg_results.returncode == 0:
                 # delete the source file
                 os.remove(vid)
