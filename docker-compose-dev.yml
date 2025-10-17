@@ -7,7 +7,7 @@ services:
     # ports:
     #  - "8000:8000/tcp"
     volumes:
-      - ./chromadb-data:/chroma/chroma
+      - ./chromadb-data:/data
     environment:
       ANONYMIZED_TELEMETRY: False # disable telemetry metrics
     healthcheck:
