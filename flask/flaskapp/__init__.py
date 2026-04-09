@@ -389,8 +389,8 @@ def create_app():
                     weighted_mean(disliked["embeddings"], disliked_weights)
                 )
 
-            alpha = 1.0
-            beta = 1.5
+            alpha = 1.5
+            beta = 2.0
 
             # --- PREFERENCE VECTOR ---
             if liked_centroid is None:
@@ -398,7 +398,7 @@ def create_app():
             elif disliked_centroid is None:
                 preference_vector = liked_centroid
             else:
-                preference_vector = liked_centroid - beta * disliked_centroid
+                preference_vector = alpha * liked_centroid - beta * disliked_centroid
 
             preference_vector = normalize(preference_vector)
 
@@ -433,7 +433,7 @@ def create_app():
                     else 0
                 )
 
-                score = score_like - beta * score_dislike
+                score = alpha * score_like - beta * score_dislike
 
                 results.append({
                     "score": score,
