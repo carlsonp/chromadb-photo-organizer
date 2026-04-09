@@ -11,7 +11,7 @@ from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from flask_compress import Compress
 from PIL import Image
 from PIL.ExifTags import TAGS
-from utility import get_imgs
+from utility import get_imgs, weighted_mean, cosine_sim, normalize
 
 from redis import Redis
 from rq import Queue
@@ -332,39 +332,125 @@ def create_app():
             app.logger.error(e)
             return "Failure getting filtered images"
 
+
     @app.route("/mightlike")
     def mightlike():
         try:
             client = chromadb.HttpClient(host="chromadb", port=8000)
             embedding_function = OpenCLIPEmbeddingFunction()
             data_loader = ImageLoader()
+
             collection = client.get_or_create_collection(
                 name="chromadb-photo-organizer",
                 embedding_function=embedding_function,
                 data_loader=data_loader,
             )
 
-            retrieved = collection.get(
-                include=["embeddings"], where={"favoritecount": {"$gte": 1}}
+            liked = collection.get(
+                include=["embeddings", "metadatas"],
+                where={"favoritecount": {"$gte": 1}},
             )
 
-            # average all the embeddings into one value to then search on
-            average_embedding = np.mean(retrieved["embeddings"], axis=0).tolist()
+            disliked = collection.get(
+                include=["embeddings", "metadatas"],
+                where={"favoritecount": {"$lte": -1}},
+            )
 
-            # https://docs.trychroma.com/usage-guide#querying-a-collection
-            # find new images based on the embeddings that haven't been voted on
+            # --- COLD START ---
+            if len(liked["embeddings"]) == 0 and len(disliked["embeddings"]) == 0:
+                retrieved = collection.get(
+                    include=["metadatas", "uris"],
+                    where={"favoritecount": {"$eq": 0}},
+                    limit=8,
+                )
+
+                return render_template(
+                    "results.html",
+                    ids=retrieved["ids"],
+                    imageuris=retrieved["uris"],
+                    metadatas=retrieved["metadatas"],
+                )
+
+            # --- BUILD WEIGHTS ---
+            liked_weights = [m["favoritecount"] for m in liked["metadatas"]]
+            disliked_weights = [abs(m["favoritecount"]) for m in disliked["metadatas"]]
+
+            # --- CENTROIDS ---
+            liked_centroid = None
+            disliked_centroid = None
+
+            if len(liked["embeddings"]) > 0:
+                liked_centroid = normalize(
+                    weighted_mean(liked["embeddings"], liked_weights)
+                )
+
+            if len(disliked["embeddings"]) > 0:
+                disliked_centroid = normalize(
+                    weighted_mean(disliked["embeddings"], disliked_weights)
+                )
+
+            alpha = 1.0
+            beta = 1.5
+
+            # --- PREFERENCE VECTOR ---
+            if liked_centroid is None:
+                preference_vector = -disliked_centroid
+            elif disliked_centroid is None:
+                preference_vector = liked_centroid
+            else:
+                preference_vector = liked_centroid - beta * disliked_centroid
+
+            preference_vector = normalize(preference_vector)
+
+            # --- QUERY ---
             retrieved = collection.query(
-                query_embeddings=[average_embedding],
-                include=["data", "metadatas"],
-                n_results=8,
+                query_embeddings=[preference_vector.tolist()],
+                include=["embeddings", "metadatas", "uris"],
+                n_results=16,
                 where={"favoritecount": {"$eq": 0}},
             )
 
+            # --- RE-RANK ---
+            results = []
+
+            for emb, metadata, uri, id_ in zip(
+                retrieved["embeddings"][0],
+                retrieved["metadatas"][0],
+                retrieved["uris"][0],
+                retrieved["ids"][0],
+            ):
+                emb = normalize(emb)
+
+                score_like = (
+                    cosine_sim(emb, liked_centroid)
+                    if liked_centroid is not None
+                    else 0
+                )
+
+                score_dislike = (
+                    cosine_sim(emb, disliked_centroid)
+                    if disliked_centroid is not None
+                    else 0
+                )
+
+                score = score_like - beta * score_dislike
+
+                results.append({
+                    "score": score,
+                    "metadata": metadata,
+                    "uri": uri,
+                    "id": id_,
+                })
+
+            results.sort(key=lambda x: x["score"], reverse=True)
+
+            top = results[:8]
+
             return render_template(
                 "results.html",
-                ids=retrieved["ids"][0],
-                imageuris=retrieved["uris"][0],
-                metadatas=retrieved["metadatas"][0],
+                ids=[r["id"] for r in top],
+                imageuris=[r["uri"] for r in top],
+                metadatas=[r["metadata"] for r in top],
             )
 
         except Exception as e:

@@ -1,6 +1,7 @@
 import os
 import subprocess
 from pathlib import Path
+import numpy as np
 
 
 # https://betterprogramming.pub/glob-generators-with-python-be9ad86ca682
@@ -57,3 +58,16 @@ def convertVideoFormat(
             if deletesource and ffmpeg_results.returncode == 0:
                 # delete the source file
                 os.remove(vid)
+
+def weighted_mean(embeddings, weights):
+    embeddings = np.array(embeddings)
+    weights = np.array(weights).reshape(-1, 1)
+    return (embeddings * weights).sum(axis=0) / weights.sum()
+
+def cosine_sim(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+def normalize(v):
+    v = np.array(v)
+    norm = np.linalg.norm(v)
+    return v / norm if norm > 0 else v
