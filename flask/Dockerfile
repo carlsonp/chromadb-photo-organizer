@@ -25,6 +25,10 @@ COPY init-blip.py /
 
 RUN HF_HOME=/root/.cache/huggingface && python3 /init-clip.py && python3 /init-blip.py
 
+# after we download any Huggingface models, run it completely offline
+ENV HF_HUB_OFFLINE=1
+ENV TRANSFORMERS_OFFLINE=1
+
 # these settings are extremely conservative, we need to bump up memory and processing
 # so we can handle larger image sizes during conversion
 RUN rm -f /etc/ImageMagick-6/policy.xml
