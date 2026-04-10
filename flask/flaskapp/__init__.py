@@ -1,24 +1,24 @@
+import os
 import random
 import subprocess
-import os
 from pathlib import Path
 
 import chromadb
 import humanize
 import numpy as np
+import umap
 from chromadb.utils.data_loaders import ImageLoader
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from flask_compress import Compress
 from PIL import Image
 from PIL.ExifTags import TAGS
-from utility import get_imgs, weighted_mean, cosine_sim, normalize
-
-import umap
-
 from redis import Redis
 from rq import Queue
-
-from worker_jobs import organize_files, convert_gif_to_mp4, convert_gif_to_webm, convert_webm_to_mp4, convert_mp4_to_webm, extract_images_videos, generate_captions
+from utility import cosine_sim, get_imgs, normalize, weighted_mean
+from worker_jobs import (convert_gif_to_mp4, convert_gif_to_webm,
+                         convert_mp4_to_webm, convert_webm_to_mp4,
+                         extract_images_videos, generate_captions,
+                         organize_files)
 
 from flask import Flask, redirect, render_template, request, url_for
 
@@ -80,7 +80,7 @@ def create_app():
                 and os.environ.get("CONVERT_GIF_TO_MP4").lower() == "true"
             ):
                 q.enqueue(convert_gif_to_mp4)
-            
+
             if (
                 os.environ.get("CONVERT_GIF_TO_WEBM")
                 and os.environ.get("CONVERT_GIF_TO_WEBM").lower() == "true"
@@ -138,7 +138,7 @@ def create_app():
         except Exception as e:
             app.logger.error(e)
             return "Failure searching"
-    
+
     @app.route("/tasks")
     def tasks():
         return render_template("tasks.html", tasks=q.jobs)
@@ -334,7 +334,6 @@ def create_app():
             app.logger.error(e)
             return "Failure getting filtered images"
 
-
     @app.route("/mightlike")
     def mightlike():
         try:
@@ -402,7 +401,9 @@ def create_app():
             else:
                 preference_vector = alpha * liked_centroid - beta * disliked_centroid
 
-            noise_scale = 0.05 # adjust this for a small amount of randomness and variation
+            noise_scale = (
+                0.05  # adjust this for a small amount of randomness and variation
+            )
             noise = np.random.normal(0, noise_scale, size=len(preference_vector))
             preference_vector = normalize(preference_vector + noise)
 
@@ -426,9 +427,7 @@ def create_app():
                 emb = normalize(emb)
 
                 score_like = (
-                    cosine_sim(emb, liked_centroid)
-                    if liked_centroid is not None
-                    else 0
+                    cosine_sim(emb, liked_centroid) if liked_centroid is not None else 0
                 )
 
                 score_dislike = (
@@ -439,12 +438,14 @@ def create_app():
 
                 score = alpha * score_like - beta * score_dislike
 
-                results.append({
-                    "score": score,
-                    "metadata": metadata,
-                    "uri": uri,
-                    "id": id_,
-                })
+                results.append(
+                    {
+                        "score": score,
+                        "metadata": metadata,
+                        "uri": uri,
+                        "id": id_,
+                    }
+                )
 
             results.sort(key=lambda x: x["score"], reverse=True)
 
@@ -462,7 +463,7 @@ def create_app():
         except Exception as e:
             app.logger.error(e)
             return "Failure getting images you might like"
-        
+
     @app.route("/embedding-map")
     def embedding_map():
         try:
@@ -475,15 +476,24 @@ def create_app():
                 embedding_function=embedding_function,
                 data_loader=data_loader,
             )
-                
+
             all_data = collection.get(
                 include=["embeddings", "metadatas", "uris"],
             )
 
             # if we have a substantial set of images, sample down to 1000
-            if len(all_data) > 1000:
-                all_data = random.sample(all_data, 1000)
-            
+            num_items = len(all_data["ids"])
+
+            if num_items > 1000:
+                indices = random.sample(range(num_items), 1000)
+
+                all_data = {
+                    "ids": [all_data["ids"][i] for i in indices],
+                    "embeddings": [all_data["embeddings"][i] for i in indices],
+                    "metadatas": [all_data["metadatas"][i] for i in indices],
+                    "uris": [all_data["uris"][i] for i in indices],
+                }
+
             embeddings = np.array(all_data["embeddings"])
 
             reducer = umap.UMAP(n_components=2)
@@ -492,7 +502,7 @@ def create_app():
             points = []
             for i, (x, y) in enumerate(embedding_2d):
                 metadata = all_data["metadatas"][i]
-                
+
                 if metadata["favoritecount"] > 0:
                     label = "liked"
                 elif metadata["favoritecount"] < 0:
@@ -500,12 +510,14 @@ def create_app():
                 else:
                     label = "neutral"
 
-                points.append({
-                    "x": float(x),
-                    "y": float(y),
-                    "label": label,
-                    "uri": all_data["uris"][i],
-                })
+                points.append(
+                    {
+                        "x": float(x),
+                        "y": float(y),
+                        "label": label,
+                        "uri": all_data["uris"][i],
+                    }
+                )
 
             return render_template("embedding-map.html", points=points)
         except Exception as e:
