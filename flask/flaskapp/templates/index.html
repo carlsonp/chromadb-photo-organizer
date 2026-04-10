@@ -20,6 +20,15 @@
                     {{ ext }}<br>
                 {% endfor %}
             {% endif %}
+            <br>
+            {% if upvotes is defined %}
+                {{ upvotes }}
+            {% endif %}
+            <br>
+            {% if downvotes is defined %}
+                {{ downvotes }}
+            {% endif %}
+            <br>
             {% if textmessage is defined %}
             <div class="alert alert-success" role="alert">{{ textmessage }}</div>
             {% endif %}

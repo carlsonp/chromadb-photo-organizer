@@ -52,11 +52,31 @@ def create_app():
             for key, value in breakdownbyextensiondict.items():
                 breakdownbyextensionlist.append(f"{key}: {humanize.naturalsize(value)}")
 
+            liked = collection.get(
+                include=["metadatas"],
+                where={"favoritecount": {"$gte": 1}},
+            )
+
+            disliked = collection.get(
+                include=["metadatas"],
+                where={"favoritecount": {"$lte": -1}},
+            )
+
+            liked_meta = liked["metadatas"]
+            disliked_meta = disliked["metadatas"]
+
+            num_liked_images = len(liked_meta)
+            num_disliked_images = len(disliked_meta)
+            total_positive_votes = sum(m.get("favoritecount", 0) for m in liked_meta)
+            total_negative_votes = sum(m.get("favoritecount", 0) for m in disliked_meta)
+
             return render_template(
                 "index.html",
                 numberimages=collection.count(),
                 imagesize=humanize.naturalsize(image_bytes),
                 breakdownbyextensionlist=breakdownbyextensionlist,
+                upvotes=f"{total_positive_votes} total upvotes across {num_liked_images} images",
+                downvotes=f"{total_negative_votes} total downvotes across {num_disliked_images} images",
             )
         except Exception as e:
             app.logger.error(e)
