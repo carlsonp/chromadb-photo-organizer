@@ -400,7 +400,9 @@ def create_app():
             else:
                 preference_vector = alpha * liked_centroid - beta * disliked_centroid
 
-            preference_vector = normalize(preference_vector)
+            noise_scale = 0.05 # adjust this for a small amount of randomness and variation
+            noise = np.random.normal(0, noise_scale, size=len(preference_vector))
+            preference_vector = normalize(preference_vector + noise)
 
             # --- QUERY ---
             retrieved = collection.query(
@@ -444,7 +446,9 @@ def create_app():
 
             results.sort(key=lambda x: x["score"], reverse=True)
 
-            top = results[:8]
+            # grab top 16, but sample that randomly down to 8 results
+            candidates = results[:16]
+            top = random.sample(candidates, 8)
 
             return render_template(
                 "results.html",
