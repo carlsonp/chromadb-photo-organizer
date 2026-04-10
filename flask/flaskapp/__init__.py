@@ -13,6 +13,8 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 from utility import get_imgs, weighted_mean, cosine_sim, normalize
 
+import umap
+
 from redis import Redis
 from rq import Queue
 
@@ -460,6 +462,55 @@ def create_app():
         except Exception as e:
             app.logger.error(e)
             return "Failure getting images you might like"
+        
+    @app.route("/embedding-map")
+    def embedding_map():
+        try:
+            client = chromadb.HttpClient(host="chromadb", port=8000)
+            embedding_function = OpenCLIPEmbeddingFunction()
+            data_loader = ImageLoader()
+
+            collection = client.get_or_create_collection(
+                name="chromadb-photo-organizer",
+                embedding_function=embedding_function,
+                data_loader=data_loader,
+            )
+                
+            all_data = collection.get(
+                include=["embeddings", "metadatas", "uris"],
+            )
+            
+            embeddings = np.array(all_data["embeddings"])
+
+            reducer = umap.UMAP(n_components=2)
+            embedding_2d = reducer.fit_transform(embeddings)
+
+            points = []
+            for i, (x, y) in enumerate(embedding_2d):
+                metadata = all_data["metadatas"][i]
+                
+                if metadata["favoritecount"] > 0:
+                    label = "liked"
+                elif metadata["favoritecount"] < 0:
+                    label = "disliked"
+                else:
+                    label = "neutral"
+
+                points.append({
+                    "x": float(x),
+                    "y": float(y),
+                    "label": label,
+                    "uri": all_data["uris"][i],
+                })
+
+            # if we have a substantial set of images, sample down to 1000
+            if len(points) > 1000:
+                points = random.sample(points, 1000)
+
+            return render_template("embedding-map.html", points=points)
+        except Exception as e:
+            app.logger.error(e)
+            return "Failure generating embedding map"
 
     @app.route("/deleteindex")
     def deleteindex():

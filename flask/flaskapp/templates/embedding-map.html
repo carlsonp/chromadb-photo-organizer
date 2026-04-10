@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<br>
+
+<script src="{{ url_for('static', filename='js/plotly.min.js') }}"></script>
+
+<div id="plot" style="width:100%; height:90vh;"></div>
+
+<img id="preview" style="
+    position:absolute;
+    width:200px;
+    display:none;
+    border:1px solid #333;
+    background:white;
+    pointer-events:none;
+"/>
+
+<script>
+const points = {{ points | default([]) | tojson }};
+
+// split by category
+const liked = points.filter(p => p.label === "liked");
+const disliked = points.filter(p => p.label === "disliked");
+const neutral = points.filter(p => p.label === "neutral");
+
+function makeTrace(data, name, color) {
+    return {
+        x: data.map(p => p.x),
+        y: data.map(p => p.y),
+        text: data.map(p => p.uri),
+        mode: 'markers',
+        type: 'scattergl',
+        name: name,
+        marker: { color: color, size: 6 }
+    };
+}
+
+const traces = [
+    makeTrace(neutral, "Neutral", "gray"),
+    makeTrace(liked, "Liked", "green"),
+    makeTrace(disliked, "Disliked", "red"),
+];
+
+const plot = document.getElementById('plot');
+const preview = document.getElementById('preview');
+
+Plotly.newPlot('plot', traces, {
+    margin: { t: 0 },
+    hovermode: 'closest',
+    legend: { orientation: "h" }
+});
+
+// hover preview
+plot.on('plotly_hover', function(data) {
+    const uri = data.points[0].text;
+
+    preview.src = uri;
+    preview.style.display = 'block';
+});
+
+plot.on('plotly_unhover', function() {
+    preview.style.display = 'none';
+});
+
+document.addEventListener('mousemove', function(e) {
+    preview.style.left = (e.pageX + 15) + 'px';
+    preview.style.top = (e.pageY + 15) + 'px';
+});
+
+</script>
+
+{% endblock %}
