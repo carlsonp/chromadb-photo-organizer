@@ -1,6 +1,7 @@
 import os
 import subprocess
 from pathlib import Path
+
 import numpy as np
 
 
@@ -59,13 +60,16 @@ def convertVideoFormat(
                 # delete the source file
                 os.remove(vid)
 
+
 def weighted_mean(embeddings, weights):
     embeddings = np.array(embeddings)
     weights = np.array(weights).reshape(-1, 1)
     return (embeddings * weights).sum(axis=0) / weights.sum()
 
+
 def cosine_sim(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
 
 def normalize(v):
     v = np.array(v)

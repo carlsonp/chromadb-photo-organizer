@@ -67,7 +67,7 @@ plot.on('plotly_unhover', function() {
 plot.on('plotly_click', function(data) {
     const uri = data.points[0].text;
 
-    const url = "favorite?favorite=" 
+    const url = "favorite?favorite="
                 + encodeURIComponent(uri);
 
     window.location.href = url;

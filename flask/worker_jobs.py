@@ -7,7 +7,7 @@ import torch
 from chromadb.utils.data_loaders import ImageLoader
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
 from PIL import Image
-from transformers import BlipProcessor, BlipForConditionalGeneration
+from transformers import BlipForConditionalGeneration, BlipProcessor
 from utility import convertVideoFormat, get_imgs, get_videos
 
 
@@ -37,6 +37,7 @@ def organize_files():
     except Exception as e:
         print(f"Error: {e}")
 
+
 def convert_gif_to_mp4():
     try:
         print("Converting GIF files to MP4...")
@@ -50,6 +51,7 @@ def convert_gif_to_mp4():
         print("Finished converting GIF to MP4")
     except Exception as e:
         print(f"Error: {e}")
+
 
 def convert_gif_to_webm():
     try:
@@ -65,6 +67,7 @@ def convert_gif_to_webm():
     except Exception as e:
         print(f"Error: {e}")
 
+
 def convert_webm_to_mp4():
     try:
         print("Converting WEBM files to MP4...")
@@ -79,6 +82,7 @@ def convert_webm_to_mp4():
     except Exception as e:
         print(f"Error: {e}")
 
+
 def convert_mp4_to_webm():
     try:
         print("Converting MP4 files to WEBM...")
@@ -92,6 +96,7 @@ def convert_mp4_to_webm():
         print("Finished converting MP4 to WEBM")
     except Exception as e:
         print(f"Error: {e}")
+
 
 def extract_images_videos():
     try:
@@ -176,14 +181,19 @@ def extract_images_videos():
         metadatacleanup = collection.get(include=[])
         for img in metadatacleanup["ids"]:
             if not Path(img).is_file():
-                print(f"Removing image: {img} from ChromaDB as it no longer exists on disk")
+                print(
+                    f"Removing image: {img} from ChromaDB as it no longer exists on disk"
+                )
                 collection.delete(ids=[img])
             if not Path(img.removesuffix(".png")).is_file():
-                print(f"Removing image: {img.removesuffix('.png')} from ChromaDB as it no longer exists on disk")
+                print(
+                    f"Removing image: {img.removesuffix('.png')} from ChromaDB as it no longer exists on disk"
+                )
                 collection.delete(ids=[img.removesuffix(".png")])
         print("Finished ChromaDB cleanup")
     except Exception as e:
         print(f"Error: {e}")
+
 
 def generate_captions():
     try:
@@ -199,12 +209,16 @@ def generate_captions():
         )
 
         device = "cuda:0" if torch.cuda.is_available() else "cpu"
-        torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+        torch.float16 if torch.cuda.is_available() else torch.float32
 
         # https://huggingface.co/microsoft/Florence-2-large
         # https://huggingface.co/Salesforce/blip-image-captioning-base
-        processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-        model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base").to(device)
+        processor = BlipProcessor.from_pretrained(
+            "Salesforce/blip-image-captioning-base"
+        )
+        model = BlipForConditionalGeneration.from_pretrained(
+            "Salesforce/blip-image-captioning-base"
+        ).to(device)
 
         def generateCaption(image_path):
             try:
@@ -226,9 +240,7 @@ def generate_captions():
         for _i, metadata in enumerate(imagecaptionscheck["metadatas"]):
             if "caption" not in metadata or metadata["caption"] == "":
                 upsertmetadata = metadata
-                upsertmetadata["caption"] = generateCaption(
-                    metadata["relative_path"]
-                )
+                upsertmetadata["caption"] = generateCaption(metadata["relative_path"])
                 collection.update(
                     ids=[metadata["relative_path"]], metadatas=[upsertmetadata]
                 )
