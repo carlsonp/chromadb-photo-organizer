@@ -479,6 +479,10 @@ def create_app():
             all_data = collection.get(
                 include=["embeddings", "metadatas", "uris"],
             )
+
+            # if we have a substantial set of images, sample down to 1000
+            if len(all_data) > 1000:
+                all_data = random.sample(all_data, 1000)
             
             embeddings = np.array(all_data["embeddings"])
 
@@ -502,10 +506,6 @@ def create_app():
                     "label": label,
                     "uri": all_data["uris"][i],
                 })
-
-            # if we have a substantial set of images, sample down to 1000
-            if len(points) > 1000:
-                points = random.sample(points, 1000)
 
             return render_template("embedding-map.html", points=points)
         except Exception as e:
