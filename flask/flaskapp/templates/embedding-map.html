@@ -64,6 +64,15 @@ plot.on('plotly_unhover', function() {
     preview.style.display = 'none';
 });
 
+plot.on('plotly_click', function(data) {
+    const uri = data.points[0].text;
+
+    const url = "favorite?favorite=" 
+                + encodeURIComponent(uri);
+
+    window.location.href = url;
+});
+
 document.addEventListener('mousemove', function(e) {
     preview.style.left = (e.pageX + 15) + 'px';
     preview.style.top = (e.pageY + 15) + 'px';
