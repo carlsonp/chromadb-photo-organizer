@@ -33,7 +33,7 @@ openssl req -x509 -nodes -days 4096 -newkey rsa:2048 -out cert.crt -keyout cert.
 
 Or use Let's Encrypt or some other method.
 
-Edit the `./traefik/traefik.yaml` file and adjust the *.crt and *.key names as needed.
+Edit the `./traefik/traefik.yaml` file and adjust the `*.crt` and `*.key` names as needed.
 
 Edit `docker-compose.yml` and adjust:
 
@@ -101,4 +101,4 @@ fdupes -r -d ./static/images/
 
 ## References
 
-* https://docs.trychroma.com/deployment
+* [https://docs.trychroma.com/deployment](https://docs.trychroma.com/deployment)
