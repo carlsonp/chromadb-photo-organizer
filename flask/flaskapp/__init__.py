@@ -132,7 +132,7 @@ def create_app():
             app.logger.error(e)
             return "Failure indexing"
 
-    @app.route("/search", methods=["POST"])
+    @app.route("/search", methods=["GET", "POST"])
     def search():
         try:
             client = chromadb.HttpClient(host="chromadb", port=8000)
@@ -141,18 +141,36 @@ def create_app():
                 name="chromadb-photo-organizer", embedding_function=embedding_function
             )
 
-            # https://docs.trychroma.com/usage-guide#querying-a-collection
+            query = request.values.get("search")
+            page = int(request.values.get("page", 1))
+            per_page = 8 # number of images per search result page
+            max_results = 40 # fetch up to 5 pages worth
+
             retrieved = collection.query(
-                query_texts=[request.form.get("search")],
+                query_texts=[query],
                 include=["data", "metadatas"],
-                n_results=8,
+                n_results=max_results,
             )
+
+            # Slice the results for the current page
+            all_ids = retrieved["ids"][0]
+            all_uris = retrieved["uris"][0]
+            all_metadatas = retrieved["metadatas"][0]
+
+            start = (page - 1) * per_page
+            end = start + per_page
+            total_pages = (len(all_ids) + per_page - 1) // per_page
 
             return render_template(
                 "results.html",
-                ids=retrieved["ids"][0],
-                imageuris=retrieved["uris"][0],
-                metadatas=retrieved["metadatas"][0],
+                ids=all_ids[start:end],
+                imageuris=all_uris[start:end],
+                metadatas=all_metadatas[start:end],
+                query=query,
+                page=page,
+                total_pages=total_pages,
+                has_prev=page > 1,
+                has_next=page < total_pages,
             )
 
         except Exception as e:

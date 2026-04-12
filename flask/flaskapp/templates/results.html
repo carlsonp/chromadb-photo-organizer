@@ -77,5 +77,26 @@
         </div>
     {% endfor %}
     </div>
+
+    {% if has_prev or has_next %}
+    <br>
+    <form method="get" action="/search">
+        <input type="hidden" name="search" value="{{ query }}">
+
+        <div class="pagination justify-content-md-center">
+            {% if has_prev %}
+            <a class="btn btn-success" href="/search?search={{ query }}&page={{ page - 1 }}"><- Prev</a>
+            {% endif %}
+
+            <span> - Page {{ page }} of {{ total_pages }} - </span>
+
+            {% if has_next %}
+            <a class="btn btn-success" href="/search?search={{ query }}&page={{ page + 1 }}">Next -></a>
+            {% endif %}
+        </div>
+    </form>
+    <br>
+    <br>
+    {% endif %}
 </div>
 {% endblock %}
