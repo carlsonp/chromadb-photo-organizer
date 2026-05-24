@@ -21,6 +21,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+        with:
+          platforms: all
       - name: Set up Docker Buildx
         # Setting up Docker Buildx with docker-container driver is required
         # at the moment to be able to use a subdirectory with Git context
@@ -50,16 +54,17 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: "{{defaultContext}}:flask"
-          push: false
+          push: true
           tags: ghcr.io/carlsonp/chromadb-photo-organizer:latest
+          platforms: linux/amd64,linux/arm64
           # Load is a shorthand for --output=type=docker (default false)
           load: true
           # https://docs.docker.com/build/ci/github-actions/cache/
-          # cache-from: type=registry,ref=ghcr.io/carlsonp/chromadb-photo-organizer:latest
-          # cache-to: type=inline
+          cache-from: type=registry,ref=ghcr.io/carlsonp/chromadb-photo-organizer:latest
+          cache-to: type=inline
           # cache to Github
-          cache-from: type=gha
-          cache-to: type=gha
+          #cache-from: type=gha
+          #cache-to: type=gha
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
       - name: Run Trivy vulnerability scanner
