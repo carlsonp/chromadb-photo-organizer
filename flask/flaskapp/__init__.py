@@ -24,6 +24,8 @@ from flask import Flask, redirect, render_template, request, url_for
 
 q = Queue(connection=Redis(host="valkey", port=6379))
 
+embedding_function = OpenCLIPEmbeddingFunction()
+
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True, static_folder="/static/")
@@ -33,7 +35,6 @@ def create_app():
     def homepage():
         try:
             client = chromadb.HttpClient(host="chromadb", port=8000)
-            embedding_function = OpenCLIPEmbeddingFunction()
             collection = client.get_or_create_collection(
                 name="chromadb-photo-organizer", embedding_function=embedding_function
             )
@@ -136,7 +137,6 @@ def create_app():
     def search():
         try:
             client = chromadb.HttpClient(host="chromadb", port=8000)
-            embedding_function = OpenCLIPEmbeddingFunction()
             collection = client.get_or_create_collection(
                 name="chromadb-photo-organizer", embedding_function=embedding_function
             )
@@ -186,7 +186,6 @@ def create_app():
         try:
             # adds a tag to chromadb
             client = chromadb.HttpClient(host="chromadb", port=8000)
-            embedding_function = OpenCLIPEmbeddingFunction()
             collection = client.get_or_create_collection(
                 name="chromadb-photo-organizer", embedding_function=embedding_function
             )
@@ -219,7 +218,6 @@ def create_app():
         try:
             # deletes a tag in chromadb
             client = chromadb.HttpClient(host="chromadb", port=8000)
-            embedding_function = OpenCLIPEmbeddingFunction()
             collection = client.get_or_create_collection(
                 name="chromadb-photo-organizer", embedding_function=embedding_function
             )
@@ -267,7 +265,6 @@ def create_app():
         try:
             # finds images that are similar to a provided image
             client = chromadb.HttpClient(host="chromadb", port=8000)
-            embedding_function = OpenCLIPEmbeddingFunction()
             collection = client.get_or_create_collection(
                 name="chromadb-photo-organizer", embedding_function=embedding_function
             )
@@ -297,7 +294,7 @@ def create_app():
     def randomimages():
         try:
             client = chromadb.HttpClient(host="chromadb", port=8000)
-            embedding_function = OpenCLIPEmbeddingFunction()
+            
             data_loader = ImageLoader()
             collection = client.get_or_create_collection(
                 name="chromadb-photo-organizer",
@@ -328,7 +325,6 @@ def create_app():
     def filteredimages():
         try:
             client = chromadb.HttpClient(host="chromadb", port=8000)
-            embedding_function = OpenCLIPEmbeddingFunction()
             data_loader = ImageLoader()
             collection = client.get_or_create_collection(
                 name="chromadb-photo-organizer",
@@ -376,7 +372,6 @@ def create_app():
     def mightlike():
         try:
             client = chromadb.HttpClient(host="chromadb", port=8000)
-            embedding_function = OpenCLIPEmbeddingFunction()
             data_loader = ImageLoader()
 
             collection = client.get_or_create_collection(
@@ -506,7 +501,6 @@ def create_app():
     def embedding_map():
         try:
             client = chromadb.HttpClient(host="chromadb", port=8000)
-            embedding_function = OpenCLIPEmbeddingFunction()
             data_loader = ImageLoader()
 
             collection = client.get_or_create_collection(
@@ -610,7 +604,6 @@ def create_app():
 
             # favorite images and see other images that are similar to it
             client = chromadb.HttpClient(host="chromadb", port=8000)
-            embedding_function = OpenCLIPEmbeddingFunction()
             collection = client.get_or_create_collection(
                 name="chromadb-photo-organizer", embedding_function=embedding_function
             )
